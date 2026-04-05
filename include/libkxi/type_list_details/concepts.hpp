@@ -6,7 +6,7 @@
 namespace kxi::type_list {
 
 template <typename T>
-struct IsTypeListSpec : utility::IsSpecOf<T, TypeList> {};
+struct IsTypeListSpec : utility::IsTypeSpecOf<T, TypeList> {};
 
 template <typename T>
 constexpr const bool IsTypeListSpecV = IsTypeListSpec<T>::value;

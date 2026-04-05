@@ -6,7 +6,7 @@
 namespace kxi::tuple {
 
 template <typename T>
-struct IsTupleSpec : utility::IsSpecOf<T, Tuple> {};
+struct IsTupleSpec : utility::IsTypeSpecOf<T, Tuple> {};
 
 template <typename T>
 constexpr const bool IsTupleSpecV = IsTupleSpec<T>::value;

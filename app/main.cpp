@@ -1,6 +1,7 @@
 // NOLINTBEGIN
 
 #include <iostream>
+#include <libkxi/sorted_tuple.hpp>
 #include <libkxi/tuple.hpp>
 
 int main() {
