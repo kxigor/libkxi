@@ -7,9 +7,9 @@
 #include "tuple_core.hpp"
 #include "tuple_fwd.hpp"
 
-namespace kxi::flat_tuple::details {
+namespace kxi::tuple::details {
 template <concepts::Tuple... TuplesT>
-struct FlatGetImpl {
+struct FlatGetHelper {
   using TypeListOfAllTypes =
       type_list::CatListsT<type_list::TupleAsTypeListT<TuplesT>...>;
   static constexpr const std::size_t kNumberOfAllTypes =
@@ -31,4 +31,4 @@ struct FlatGetImpl {
         .template Get<kDestinationPos.elem_pos>();
   }
 };
-};  // namespace kxi::flat_tuple::details
+};  // namespace kxi::tuple::details

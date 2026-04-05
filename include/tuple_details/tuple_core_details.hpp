@@ -5,14 +5,14 @@
 #include "../type_list.hpp"
 #include "../utility.hpp"
 
-namespace kxi::flat_tuple::details {
+namespace kxi::tuple::details {
 
 template <std::size_t I, typename T>
 struct FlatTypeHolder {
  public:
   /*===================== Usings/Constants =====================*/
   static constexpr std::size_t kHolderNumber = I;
-  using value_type = T;
+  using ValueT = T;
 
   /*================= Constructors/Destructors =================*/
   constexpr FlatTypeHolder() = default;
@@ -23,7 +23,7 @@ struct FlatTypeHolder {
 
   template <typename... Args>
   requires utility::concepts::PerfectCtorGuard<FlatTypeHolder, Args...> &&
-           std::is_constructible_v<value_type, Args...>
+           std::is_constructible_v<ValueT, Args...>
   constexpr FlatTypeHolder(Args&&... args)
       : value_(std::forward<Args>(args)...) {}
 
@@ -36,13 +36,13 @@ struct FlatTypeHolder {
   constexpr FlatTypeHolder& operator=(FlatTypeHolder&& /*unused*/) = default;
 
   /*========================= Getters ==========================*/
-  value_type& Value() { return value_; }
+  ValueT& Value() { return value_; }
 
-  const value_type& Value() const { return value_; }
+  const ValueT& Value() const { return value_; }
 
  private:
   /*======================= Data fields ========================*/
-  value_type value_;
+  ValueT value_;
 };
 
 template <typename IndexesCortage, typename TypesCortage>
@@ -98,6 +98,11 @@ class FlatTupleImpl<std::index_sequence<Indexes...>,
     return std::forward<Self>(self)
         .template Get<type_list::GetIndexV<TypesCortage, T>>();
   }
+
+  constexpr void Swap(FlatTupleImpl& other) noexcept((std::is_nothrow_swappable_v<Types> && ...)) {
+    (std::swap(Get<Indexes>(), other.Get<Indexes>()), ...);
+  }
+
 };
 
-}  // namespace kxi::flat_tuple::details
+}  // namespace kxi::tuple::details

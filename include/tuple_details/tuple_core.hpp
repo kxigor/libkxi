@@ -5,7 +5,7 @@
 #include "../type_list.hpp"
 #include "tuple_core_details.hpp"
 
-namespace kxi::flat_tuple {
+namespace kxi::tuple {
 template <typename... Args>
 class Tuple
     : public details::FlatTupleImpl<std::make_index_sequence<sizeof...(Args)>,
@@ -17,4 +17,4 @@ class Tuple
   using BaseT::BaseT;
 };
 
-}  // namespace kxi::flat_tuple
+}  // namespace kxi::tuple

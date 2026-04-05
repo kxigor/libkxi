@@ -9,7 +9,7 @@
 #include "tuple_fwd.hpp"
 #include "tuple_ops_details.hpp"
 
-namespace kxi::flat_tuple {
+namespace kxi::tuple {
 
 template <std::size_t I, typename T, concepts::Tuple TupleT>
 constexpr decltype(auto) Get(TupleT&& tuple) {
@@ -26,13 +26,19 @@ constexpr decltype(auto) Get(TupleT&& tuple) {
   return std::forward<Tuple>(tuple).template Get<T>();
 }
 
+template <concepts::Tuple TupleT>
+constexpr void Swap(TupleT& lhs, TupleT& rhs) noexcept(
+    noexcept(std::declval<TupleT&>().Swap(std::declval<TupleT&>()))) {
+  lhs.Swap(rhs);
+}
+
 template <std::size_t I, concepts::Tuple... TuplesT>
 constexpr decltype(auto) FlatGet(TuplesT&&... tuples) {
-  using FlatGetImplT = details::FlatGetImpl<TuplesT...>;
-  using TupleOfTuplesT = FlatGetImplT::TupleOfTuplesT;
+  using FlatGetHelperT = details::FlatGetHelper<TuplesT...>;
+  using TupleOfTuplesT = FlatGetHelperT::TupleOfTuplesT;
 
   TupleOfTuplesT tuple_of_tuples{tuples...};
-  return FlatGetImplT::template Get<I>(tuple_of_tuples);
+  return FlatGetHelperT::template Get<I>(tuple_of_tuples);
 }
 
 template <typename... Args>
@@ -49,17 +55,22 @@ constexpr auto MakeTuple(Args&&... args) {
 
 template <concepts::Tuple... TuplesT>
 constexpr auto TupleCat(TuplesT&&... tuples) {
-  using FlatGetImplT = details::FlatGetImpl<TuplesT...>;
-  using TupleOfTuplesT = FlatGetImplT::TupleOfTuplesT;
+  using FlatGetHelperT = details::FlatGetHelper<TuplesT...>;
+  using TupleOfTuplesT = FlatGetHelperT::TupleOfTuplesT;
   using ResultType =
-      type_list::TypeListAsTupleT<typename FlatGetImplT::TypeListOfAllTypes>;
+      type_list::TypeListAsTupleT<typename FlatGetHelperT::TypeListOfAllTypes>;
 
   TupleOfTuplesT tuple_of_tuples{tuples...};
 
   return [&]<std::size_t... Indexes>(
              std::index_sequence<Indexes...> /*unused*/) {
-    return ResultType{FlatGetImplT::template Get<Indexes>(tuple_of_tuples)...};
-  }(std::make_index_sequence<FlatGetImplT::kNumberOfAllTypes>{});
+    return ResultType{FlatGetHelperT::template Get<Indexes>(tuple_of_tuples)...};
+  }(std::make_index_sequence<FlatGetHelperT::kNumberOfAllTypes>{});
 }
 
-}  // namespace kxi::flat_tuple
+template <typename... Args>
+constexpr auto ForwardAsTuple(Args&&... args) {
+  return Tuple<Args&&...>{std::forward<Args>(args)...};
+}
+
+}  // namespace kxi::tuple
