@@ -1,8 +1,7 @@
 #pragma once
 
 #include <type_traits>
-
-#include "utility_details.hpp"
+#include <libkxi/utility_details/details.hpp>
 
 namespace kxi::utility {
 template <typename From, typename To>

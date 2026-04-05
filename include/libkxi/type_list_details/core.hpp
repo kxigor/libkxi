@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <type_traits>
 
-#include "tuple_details/tuple_fwd.hpp"
+#include <libkxi/type_list_details/fwd.hpp>
 
 namespace kxi::type_list {
 
@@ -22,72 +22,59 @@ struct GetSize<TypeList<Types...>> {
 template <typename L>
 constexpr const std::size_t GetSizeV = GetSize<L>::value;
 
-namespace details {
 template <std::size_t I, typename L>
-struct GetTypeImpl;
+struct GetType;
 
 template <std::size_t I, typename Head, typename... Tail>
-struct GetTypeImpl<I, TypeList<Head, Tail...>> {
-  using type = GetTypeImpl<I - 1, TypeList<Tail...>>::type;
+struct GetType<I, TypeList<Head, Tail...>> {
+  using type = GetType<I - 1, TypeList<Tail...>>::type;
 };
 
 template <typename Head, typename... Tail>
-struct GetTypeImpl<0, TypeList<Head, Tail...>> {
+struct GetType<0, TypeList<Head, Tail...>> {
   using type = Head;
 };
 
 template <typename T, typename L>
-struct GetCountImpl;
+struct GetCount;
 
 template <typename T, typename Head, typename... Tail>
-struct GetCountImpl<T, TypeList<Head, Tail...>> {
+struct GetCount<T, TypeList<Head, Tail...>> {
   static constexpr const std::size_t value =
-      GetCountImpl<T, TypeList<Tail...>>::value;
+      GetCount<T, TypeList<Tail...>>::value;
 };
 
 template <typename Head, typename... Tail>
-struct GetCountImpl<Head, TypeList<Head, Tail...>> {
+struct GetCount<Head, TypeList<Head, Tail...>> {
   static constexpr const std::size_t value =
-      1 + GetCountImpl<Head, TypeList<Tail...>>::value;
+      1 + GetCount<Head, TypeList<Tail...>>::value;
 };
 
 template <typename Head>
-struct GetCountImpl<Head, TypeList<>> {
+struct GetCount<Head, TypeList<>> {
   static constexpr const std::size_t value = 0;
 };
 
 template <typename T, typename L>
-struct GetIndexImpl;
+requires(GetCount<T, L>::value == 1)
+struct GetIndex;
 
 template <typename T, typename Head, typename... Tail>
-struct GetIndexImpl<T, TypeList<Head, Tail...>> {
+struct GetIndex<T, TypeList<Head, Tail...>> {
   static constexpr const std::size_t value =
-      1 + GetIndexImpl<T, TypeList<Tail...>>::value;
+      1 + GetIndex<T, TypeList<Tail...>>::value;
 };
 
 template <typename Head, typename... Tail>
-struct GetIndexImpl<Head, TypeList<Head, Tail...>> {
+struct GetIndex<Head, TypeList<Head, Tail...>> {
   static constexpr const std::size_t value = 0;
 };
 
-}  // namespace details
+template <std::size_t I, typename L>
+using GetTypeT = typename GetType<I, L>::type;
 
-template <typename L, std::size_t I>
-struct GetType {
-  using type = details::GetTypeImpl<I, L>::type;
-};
-
-template <typename L, std::size_t I>
-using GetTypeT = typename GetType<L, I>::type;
-
-template <typename L, typename T>
-requires(details::GetCountImpl<T, L>::value == 1)
-struct GetIndex {
-  static constexpr const std::size_t value = details::GetIndexImpl<T, L>::value;
-};
-
-template <typename L, typename T>
-constexpr const std::size_t GetIndexV = GetIndex<L, T>::value;
+template <typename T, typename L>
+constexpr const std::size_t GetIndexV = GetIndex<T, L>::value;
 
 struct DestinationPos {
   std::size_t list_pos;

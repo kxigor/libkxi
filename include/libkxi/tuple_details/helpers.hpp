@@ -1,25 +1,20 @@
 #pragma once
 
 #include <cstddef>
-
-#include "../type_list.hpp"
-#include "tuple_concepts.hpp"
-#include "tuple_fwd.hpp"
+#include <libkxi/tuple_details/concepts.hpp>
+#include <libkxi/tuple_details/fwd.hpp>
+#include <libkxi/type_list.hpp>
 
 namespace kxi::tuple {
 template <concepts::Tuple TupleT>
-struct TupleSize {
-  static constexpr const std::size_t value =
-      type_list::GetSizeV<type_list::TupleAsTypeListT<TupleT>>;
-};
+struct TupleSize : type_list::GetSize<type_list::TupleAsTypeListT<TupleT>> {};
 
 template <concepts::Tuple TupleT>
 constexpr const std::size_t TupleSizeV = TupleSize<TupleT>::value;
 
 template <std::size_t I, concepts::Tuple TupleT>
-struct TupleElement {
-  using type = type_list::GetTypeT<type_list::TupleAsTypeListT<TupleT>, I>;
-};
+struct TupleElement
+    : type_list::GetType<I, type_list::TupleAsTypeListT<TupleT>> {};
 
 template <std::size_t I, concepts::Tuple TupleT>
 using TupleElementT = TupleElement<I, TupleT>::type;

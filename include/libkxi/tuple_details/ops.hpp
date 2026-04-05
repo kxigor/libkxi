@@ -1,13 +1,12 @@
 #pragma once
 
 #include <cstddef>
+#include <libkxi/tuple_details/core.hpp>
+#include <libkxi/tuple_details/fwd.hpp>
+#include <libkxi/tuple_details/ops_details.hpp>
+#include <libkxi/type_list.hpp>
 #include <type_traits>
 #include <utility>
-
-#include "../type_list.hpp"
-#include "tuple_core.hpp"
-#include "tuple_fwd.hpp"
-#include "tuple_ops_details.hpp"
 
 namespace kxi::tuple {
 
@@ -62,10 +61,11 @@ constexpr auto TupleCat(TuplesT&&... tuples) {
 
   TupleOfTuplesT tuple_of_tuples{tuples...};
 
-  return [&]<std::size_t... Indexes>(
-             std::index_sequence<Indexes...> /*unused*/) {
-    return ResultType{FlatGetHelperT::template Get<Indexes>(tuple_of_tuples)...};
-  }(std::make_index_sequence<FlatGetHelperT::kNumberOfAllTypes>{});
+  return
+      [&]<std::size_t... Indexes>(std::index_sequence<Indexes...> /*unused*/) {
+        return ResultType{
+            FlatGetHelperT::template Get<Indexes>(tuple_of_tuples)...};
+      }(std::make_index_sequence<FlatGetHelperT::kNumberOfAllTypes>{});
 }
 
 template <typename... Args>

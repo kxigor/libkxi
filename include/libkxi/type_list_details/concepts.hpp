@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../utility.hpp"
-#include "type_list_fwd.hpp"
+#include <libkxi/type_list_details/fwd.hpp>
+#include <libkxi/utility.hpp>
 
 namespace kxi::type_list {
 

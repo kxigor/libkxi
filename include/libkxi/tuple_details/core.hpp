@@ -2,8 +2,8 @@
 
 #include <utility>
 
-#include "../type_list.hpp"
-#include "tuple_core_details.hpp"
+#include <libkxi/type_list.hpp>
+#include <libkxi/tuple_details/core_details.hpp>
 
 namespace kxi::tuple {
 template <typename... Args>

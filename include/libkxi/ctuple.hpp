@@ -1,4 +1,4 @@
 #pragma once
 // NOLINTBEGIN(misc-include-cleaner)
-#include "utility_details/utility_core.hpp"
+#include "ctuple_details/fwd.hpp"
 // NOLINTEND(misc-include-cleaner)

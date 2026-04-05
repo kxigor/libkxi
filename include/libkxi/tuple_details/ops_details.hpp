@@ -1,11 +1,10 @@
 #pragma once
 
 #include <cstddef>
+#include <libkxi/tuple_details/core.hpp>
+#include <libkxi/tuple_details/fwd.hpp>
+#include <libkxi/type_list.hpp>
 #include <type_traits>
-
-#include "../type_list.hpp"
-#include "tuple_core.hpp"
-#include "tuple_fwd.hpp"
 
 namespace kxi::tuple::details {
 template <concepts::Tuple... TuplesT>
@@ -23,8 +22,9 @@ struct FlatGetHelper {
         type_list::GetDestinationPosV<I,
                                       type_list::TupleAsTypeListT<TuplesT>...>;
 
-    using NecessaryTupleT = type_list::GetTypeT<type_list::TypeList<TuplesT...>,
-                                                kDestinationPos.list_pos>;
+    using NecessaryTupleT =
+        type_list::GetTypeT<kDestinationPos.list_pos,
+                            type_list::TypeList<TuplesT...>>;
 
     return std::forward<NecessaryTupleT>(
                tuple_of_tuples.template Get<kDestinationPos.list_pos>())

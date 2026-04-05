@@ -2,8 +2,8 @@
 #include <type_traits>
 #include <utility>
 
-#include "../type_list.hpp"
-#include "../utility.hpp"
+#include <libkxi/type_list.hpp>
+#include <libkxi/utility.hpp>
 
 namespace kxi::tuple::details {
 
@@ -90,13 +90,13 @@ class FlatTupleImpl<std::index_sequence<Indexes...>,
   template <std::size_t I, typename Self>
   constexpr decltype(auto) Get(this Self&& self) {
     return std::forward<Self>(self)
-        .template Get<I, type_list::GetTypeT<TypesCortage, I>>();
+        .template Get<I, type_list::GetTypeT<I, TypesCortage>>();
   }
 
   template <typename T, typename Self>
   constexpr decltype(auto) Get(this Self&& self) {
     return std::forward<Self>(self)
-        .template Get<type_list::GetIndexV<TypesCortage, T>>();
+        .template Get<type_list::GetIndexV<T, TypesCortage>>();
   }
 
   constexpr void Swap(FlatTupleImpl& other) noexcept((std::is_nothrow_swappable_v<Types> && ...)) {

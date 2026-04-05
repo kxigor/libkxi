@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../utility.hpp"
-#include "tuple_fwd.hpp"
+#include <libkxi/tuple_details/fwd.hpp>
+#include <libkxi/utility.hpp>
 
 namespace kxi::tuple {
 
