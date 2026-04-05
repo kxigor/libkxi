@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 namespace kxi::flat_tuple {
 
 template <typename... Args>
@@ -7,28 +9,28 @@ class Tuple;
 
 namespace details {
 template <typename T>
-struct is_tuple_specialization_impl {
+struct IsTupleSpecializationImpl {
   static constexpr const bool value = false;
 };
 
 template <typename... TupleTypesT>
-struct is_tuple_specialization_impl<Tuple<TupleTypesT...>> {
+struct IsTupleSpecializationImpl<Tuple<TupleTypesT...>> {
   static constexpr const bool value = true;
 };
 }  // namespace details
 
 template <typename T>
-struct is_tuple_specialization {
+struct IsTupleSpecialization {
   static constexpr const bool value =
-      details::is_tuple_specialization_impl<std::remove_cvref_t<T>>::value;
+      details::IsTupleSpecializationImpl<std::remove_cvref_t<T>>::value;
 };
 
 template <typename T>
-constexpr const bool IsTupleSpecializationV = is_tuple_specialization<T>::value;
+constexpr const bool IsTupleSpecializationV = IsTupleSpecialization<T>::value;
 
 namespace concepts {
 template <typename T>
 concept Tuple = IsTupleSpecializationV<T>;
-}
+}  // namespace concepts
 
 }  // namespace kxi::flat_tuple

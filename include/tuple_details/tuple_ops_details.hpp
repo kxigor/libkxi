@@ -1,6 +1,11 @@
 #pragma once
 
+#include <cstddef>
+#include <type_traits>
+
+#include "../type_list.hpp"
 #include "tuple_core.hpp"
+#include "tuple_fwd.hpp"
 
 namespace kxi::flat_tuple::details {
 template <concepts::Tuple... TuplesT>
@@ -26,4 +31,4 @@ struct FlatGetImpl {
         .template Get<kDestinationPos.elem_pos>();
   }
 };
-};
+};  // namespace kxi::flat_tuple::details

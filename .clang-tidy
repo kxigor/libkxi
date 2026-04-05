@@ -19,7 +19,12 @@ Checks: >
   
   -modernize-use-trailing-return-type,
   -llvm-header-guard,
-  -bugprone-easily-swappable-parameters
+  -bugprone-easily-swappable-parameters,
+  -portability-avoid-pragma-once,
+  -readability-identifier-naming,
+  -google-explicit-constructor,
+  -cppcoreguidelines-missing-std-forward,
+  -hicpp-explicit-conversions
 WarningsAsErrors: '*'
 
 CheckOptions:

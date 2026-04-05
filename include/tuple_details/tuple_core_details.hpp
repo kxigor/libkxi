@@ -1,9 +1,9 @@
 #include <cstddef>
+#include <type_traits>
 #include <utility>
 
 #include "../type_list.hpp"
 #include "../utility.hpp"
-#include "tuple_fwd.hpp"
 
 namespace kxi::flat_tuple::details {
 

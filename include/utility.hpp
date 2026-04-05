@@ -21,6 +21,6 @@ template <typename Self, typename... Args>
 concept PerfectCtorGuard =
     (sizeof...(Args) != 1) ||
     (!std::is_same_v<std::remove_cvref_t<Args>, Self> && ...);
-}
+}  // namespace concepts
 
 }  // namespace kxi::utility

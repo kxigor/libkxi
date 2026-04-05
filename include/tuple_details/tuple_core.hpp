@@ -1,11 +1,9 @@
 #pragma once
 
-#include <cstddef>
-#include <type_traits>
 #include <utility>
 
+#include "../type_list.hpp"
 #include "tuple_core_details.hpp"
-#include "tuple_fwd.hpp"
 
 namespace kxi::flat_tuple {
 template <typename... Args>

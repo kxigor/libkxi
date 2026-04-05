@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstddef>
+#include <type_traits>
 
 #include "tuple_details/tuple_fwd.hpp"
 
