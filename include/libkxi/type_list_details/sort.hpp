@@ -62,7 +62,7 @@ struct SortImpl<PredicatT, TypeList<Types...>,
       for (std::size_t j = 0; j < i; ++j) {
         const std::size_t kLhsIdx = i - j - 1;
         const std::size_t kRhsIdx = i - j;
-        if (kCompareTable[result[kLhsIdx]][result[kRhsIdx]]) {
+        if (not kCompareTable[result[kRhsIdx]][result[kLhsIdx]]) {
           break;
         }
         std::swap(result[kLhsIdx], result[kRhsIdx]);
@@ -82,11 +82,4 @@ template <template <typename LHS, typename RHS> typename PredicatT,
           concepts::TypeList TypeListT>
 struct Sort : SortImpl<PredicatT, TypeListT,
                        std::make_index_sequence<GetSizeV<TypeListT>>> {};
-
-template <typename LHS, typename RHS>
-struct Predicat {
-  static constexpr const bool value = sizeof(LHS) < sizeof(RHS);
-};
-
-Sort<Predicat, TypeList<int, char, int>> a{};
 }  // namespace kxi::type_list

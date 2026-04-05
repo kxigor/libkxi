@@ -14,6 +14,6 @@ constexpr const bool IsTypeListSpecV = IsTypeListSpec<T>::value;
 namespace concepts {
 template <typename T>
 concept TypeList = IsTypeListSpecV<T>;
-}
+}  // namespace concepts
 
 }  // namespace kxi::type_list

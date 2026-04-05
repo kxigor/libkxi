@@ -11,12 +11,12 @@ struct IsTypeSpecOfImpl<Template<Args...>, Template> {
   static constexpr const bool value = true;
 };
 
-template<typename T, template<auto...> typename Template>
+template <typename T, template <auto...> typename Template>
 struct IsValueSpecOfImpl {
   static constexpr const bool value = false;
 };
 
-template<template<auto...> typename Template, auto ... Args>
+template <template <auto...> typename Template, auto... Args>
 struct IsValueSpecOfImpl<Template<Args...>, Template> {
   static constexpr const bool value = true;
 };

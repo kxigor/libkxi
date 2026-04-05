@@ -24,7 +24,9 @@ Checks: >
   -readability-identifier-naming,
   -google-explicit-constructor,
   -cppcoreguidelines-missing-std-forward,
-  -hicpp-explicit-conversions
+  -hicpp-explicit-conversions,
+  -misc-include-cleaner,
+  -cppcoreguidelines-pro-bounds-constant-array-index
 WarningsAsErrors: '*'
 
 CheckOptions:

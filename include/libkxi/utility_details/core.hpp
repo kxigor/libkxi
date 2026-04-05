@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <libkxi/utility_details/core_details.hpp>
 #include <type_traits>
 #include <utility>

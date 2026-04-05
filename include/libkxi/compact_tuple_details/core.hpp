@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libkxi/sort_tuple.hpp>
+#include <libkxi/sorted_tuple.hpp>
 
 namespace kxi::compact_tuple {
 

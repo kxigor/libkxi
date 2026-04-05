@@ -1,9 +1,8 @@
 #include <cstddef>
-#include <type_traits>
-#include <utility>
-
 #include <libkxi/type_list.hpp>
 #include <libkxi/utility.hpp>
+#include <type_traits>
+#include <utility>
 
 namespace kxi::tuple::details {
 
@@ -99,10 +98,10 @@ class FlatTupleImpl<std::index_sequence<Indexes...>,
         .template Get<type_list::GetIndexV<T, TypesCortage>>();
   }
 
-  constexpr void Swap(FlatTupleImpl& other) noexcept((std::is_nothrow_swappable_v<Types> && ...)) {
+  constexpr void Swap(FlatTupleImpl& other) noexcept(
+      (std::is_nothrow_swappable_v<Types> && ...)) {
     (std::swap(Get<Indexes>(), other.Get<Indexes>()), ...);
   }
-
 };
 
 }  // namespace kxi::tuple::details

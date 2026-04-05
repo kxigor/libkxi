@@ -5,8 +5,21 @@
 
 namespace kxi::sorted_tuple {
 
+namespace details {
 template <typename T>
-struct IsSortedTupleSpec : utility::IsTypeSpecOf<T, SortedTuple> {};
+struct IsSortedTupleSpecImpl {
+  static constexpr const bool value = false;
+};
+template <template <typename LHS, typename RHS> typename Predicat,
+          typename... Args>
+struct IsSortedTupleSpecImpl<SortedTuple<Predicat, Args...>> {
+  static constexpr const bool value = true;
+};
+}  // namespace details
+
+template <typename T>
+struct IsSortedTupleSpec
+    : details::IsSortedTupleSpecImpl<std::remove_cvref_t<T>> {};
 
 template <typename T>
 constexpr const bool IsSortedTupleSpecV = IsSortedTupleSpec<T>::value;

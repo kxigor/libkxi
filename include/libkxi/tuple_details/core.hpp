@@ -1,9 +1,8 @@
 #pragma once
 
-#include <utility>
-
-#include <libkxi/type_list.hpp>
 #include <libkxi/tuple_details/core_details.hpp>
+#include <libkxi/type_list.hpp>
+#include <utility>
 
 namespace kxi::tuple {
 template <typename... Args>
