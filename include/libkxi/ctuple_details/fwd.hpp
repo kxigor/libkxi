@@ -1,3 +1,6 @@
 #pragma once
 
-namespace kxi::ctuple {};
+namespace kxi::ctuple {
+template <typename... Args>
+class Ctuple;
+};

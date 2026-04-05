@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../utility.hpp"
-#include "ctuple_fwd.hpp"
+#include <libkxi/ctuple_details/fwd.hpp>
+#include <libkxi/utility.hpp>
 
 namespace kxi::ctuple {
 
