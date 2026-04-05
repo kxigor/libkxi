@@ -10,39 +10,22 @@
 
 namespace kxi::type_list {
 
-namespace concepts {
-template <typename T>
-concept PredicatResult = requires {
-  { T::value } -> std::convertible_to<bool>;
-} && std::is_same_v<const bool, decltype(T::value)>;
-}  // namespace concepts
-
 template <template <typename LHS, typename RHS> typename PredicatT,
-          concepts::TypeList TypeListT,
-          utility::concepts::IndexSequence IndexSequenceT>
-struct SortImpl;
-
-template <template <typename LHS, typename RHS> typename PredicatT,
-          typename... Types, std::size_t... Indexes>
-struct SortImpl<PredicatT, TypeList<Types...>,
-                std::index_sequence<Indexes...>> {
+          concepts::TypeList TypeListT>
+struct Sort {
  public:
-  static constexpr const std::size_t kNumOfTypes = sizeof...(Types);
+  static constexpr const std::size_t kNumOfTypes = GetSizeV<TypeListT>;
   using MappingArrayT = std::array<std::size_t, kNumOfTypes>;
-  using GivenTypeListT = TypeList<Types...>;
+  using GivenTypeListT = TypeListT;
 
-  /*
-    TODO: возможно если типов много, а памяти мало
-    лучше использовать std::vector, добавить conditional
-  */
   template <typename T, std::size_t Size>
   using CompareTableContainerT = std::array<T, Size>;
   using CompareLineT = CompareTableContainerT<bool, kNumOfTypes>;
   using CompareTableT = CompareTableContainerT<CompareLineT, kNumOfTypes>;
 
  private:
-  static constexpr auto GetCompareTable() {
-    return []<std::size_t... Is>(std::index_sequence<Is...> /*unused*/) {
+  [[nodiscard]] static constexpr auto GetCompareTable() noexcept {
+    return []<std::size_t... Is>(std::index_sequence<Is...>) {
       return CompareTableT{([]<std::size_t Idx>() {
         return CompareLineT{PredicatT<GetTypeT<Idx, GivenTypeListT>,
                                       GetTypeT<Is, GivenTypeListT>>::value...};
@@ -54,7 +37,7 @@ struct SortImpl<PredicatT, TypeList<Types...>,
   static constexpr const auto kCompareTable = GetCompareTable();
 
  private:
-  static constexpr MappingArrayT GetMappingArray() {
+  [[nodiscard]] static constexpr MappingArrayT GetMappingArray() noexcept {
     MappingArrayT result;
     std::ranges::iota(result, 0);
 
@@ -68,18 +51,16 @@ struct SortImpl<PredicatT, TypeList<Types...>,
         std::swap(result[kLhsIdx], result[kRhsIdx]);
       }
     }
-
     return result;
   }
 
  public:
   static constexpr const auto kMappingArray = GetMappingArray();
+
   using SortedTypeListT =
-      TypeList<GetTypeT<kMappingArray[Indexes], GivenTypeListT>...>;
+      decltype([]<std::size_t... Is>(std::index_sequence<Is...>) {
+        return TypeList<GetTypeT<kMappingArray[Is], GivenTypeListT>...>{};
+      }(std::make_index_sequence<kNumOfTypes>{}));
 };
 
-template <template <typename LHS, typename RHS> typename PredicatT,
-          concepts::TypeList TypeListT>
-struct Sort : SortImpl<PredicatT, TypeListT,
-                       std::make_index_sequence<GetSizeV<TypeListT>>> {};
 }  // namespace kxi::type_list
