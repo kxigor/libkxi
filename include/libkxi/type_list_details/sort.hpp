@@ -57,6 +57,19 @@ struct Sort {
  public:
   static constexpr const auto kMappingArray = GetMappingArray();
 
+ private:
+  [[nodiscard]] static constexpr MappingArrayT
+  GetInverseMappingArray() noexcept {
+    MappingArrayT result{};
+    for (std::size_t i = 0; i < kMappingArray.size(); ++i) {
+      result[kMappingArray[i]] = i;
+    }
+    return result;
+  }
+
+ public:
+  static constexpr const auto kInverseMappingArray = GetInverseMappingArray();
+
   using SortedTypeListT =
       decltype([]<std::size_t... Is>(std::index_sequence<Is...>) {
         return TypeList<GetTypeT<kMappingArray[Is], GivenTypeListT>...>{};

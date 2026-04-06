@@ -5,6 +5,7 @@
 namespace kxi::compact_tuple {
 
 /*TODO: impl*/
+template <typename LHS, typename RHS>
 struct CompactPredicat;
 
 template <typename... Args>
