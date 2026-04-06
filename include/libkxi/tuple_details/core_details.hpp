@@ -39,9 +39,13 @@ struct FlatTypeHolder {
 
   const ValueT& Value() const { return value_; }
 
+  volatile ValueT& Value() volatile { return value_; }
+
+  const volatile ValueT& Value() const volatile { return value_; }
+
  private:
   /*======================= Data fields ========================*/
-  ValueT value_;
+  ValueT value_{};
 };
 
 template <typename IndexesCortage, typename TypesCortage>
@@ -80,8 +84,7 @@ class FlatTupleImpl<std::index_sequence<Indexes...>,
   /*======================== Interface =========================*/
   template <std::size_t I, typename T, typename Self>
   constexpr decltype(auto) Get(this Self&& self) {
-    using BaseT = kxi::utility::CopyConstT<std::remove_reference_t<Self>,
-                                           FlatTypeHolder<I, T>>;
+    using BaseT = kxi::utility::CopyCVT<Self, FlatTypeHolder<I, T>>;
 
     return std::forward_like<Self>(static_cast<BaseT&>(self).Value());
   }

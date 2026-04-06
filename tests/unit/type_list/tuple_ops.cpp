@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
-#include <libkxi/type_list.hpp>
+
 #include <libkxi/tuple.hpp>
+#include <libkxi/type_list.hpp>
 #include <type_traits>
 
 namespace {
@@ -95,7 +96,8 @@ TEST(TypeListTupleOps, RoundTripListToTupleAndBack) {
 
 TEST(TypeListTupleOps, RoundTripFromQualifiedTuple) {
   using Original = Tuple<int, float>;
-  using RoundTrip = TypeListAsTupleT<TupleAsTypeListT<const volatile Original&&>>;
+  using RoundTrip =
+      TypeListAsTupleT<TupleAsTypeListT<const volatile Original&&>>;
   EXPECT_TRUE((std::is_same_v<RoundTrip, Original>));
 }
 

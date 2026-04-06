@@ -14,6 +14,7 @@ class SortedTuple {
   using SorterT = type_list::Sort<Predicat, type_list::TypeList<Types...>>;
   using BaseTupleT =
       type_list::TypeListAsTupleT<typename SorterT::SortedTypeListT>;
+  using TypesTypeListT = type_list::TypeList<Types...>;
 
  public:
   /*================= Constructors/Destructors =================*/
@@ -30,9 +31,14 @@ class SortedTuple {
       : tuple_(
             /*copy elision works here*/
             [&]<std::size_t... Is>(std::index_sequence<Is...> /*unused*/) {
-              tuple::Tuple<std::remove_reference_t<Args>&...> tuple_args{
-                  args...};
-              return BaseTupleT{std::forward<Args>(
+              using ArgsTypeListT = type_list::TypeList<Args...>;
+              using SavedArgsTupleT =
+                  tuple::Tuple<std::remove_reference_t<Args>&...>;
+
+              SavedArgsTupleT tuple_args{args...};
+
+              return BaseTupleT{std::forward<type_list::GetTypeT<
+                  SorterT::kMappingArray[Is], ArgsTypeListT>>(
                   tuple_args.template Get<SorterT::kMappingArray[Is]>())...};
             }(std::make_index_sequence<sizeof...(Args)>{})) {}
 
@@ -56,7 +62,7 @@ class SortedTuple {
   }
 
   constexpr void Swap(SortedTuple& other) noexcept(
-      std::declval<BaseTupleT>().Swap(std::declval<BaseTupleT>())) {
+      noexcept(std::declval<BaseTupleT&>().Swap(std::declval<BaseTupleT&>()))) {
     tuple_.Swap(other.tuple_);
   }
 

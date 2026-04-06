@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+
 #include <libkxi/type_list.hpp>
 #include <type_traits>
 
@@ -14,9 +15,7 @@ using kxi::type_list::TypeList;
 
 // --- GetSize ---
 
-TEST(TypeListGetSize, EmptyList) {
-  EXPECT_EQ((GetSizeV<TypeList<>>), 0u);
-}
+TEST(TypeListGetSize, EmptyList) { EXPECT_EQ((GetSizeV<TypeList<>>), 0u); }
 
 TEST(TypeListGetSize, SingleElement) {
   EXPECT_EQ((GetSizeV<TypeList<int>>), 1u);
@@ -33,7 +32,8 @@ TEST(TypeListGetType, FirstElement) {
 }
 
 TEST(TypeListGetType, MiddleElement) {
-  EXPECT_TRUE((std::is_same_v<GetTypeT<1, TypeList<int, double, char>>, double>));
+  EXPECT_TRUE(
+      (std::is_same_v<GetTypeT<1, TypeList<int, double, char>>, double>));
 }
 
 TEST(TypeListGetType, LastElement) {

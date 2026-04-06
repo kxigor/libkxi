@@ -19,6 +19,38 @@ struct CopyConst<const From, To> {
 template <typename From, typename To>
 using CopyConstT = typename CopyConst<From, To>::type;
 
+namespace details {
+
+template <typename From>
+struct CopyCVImpl {
+  template <typename To>
+  using type = To;
+};
+
+template <typename From>
+struct CopyCVImpl<const From> {
+  template <typename To>
+  using type = const To;
+};
+
+template <typename From>
+struct CopyCVImpl<volatile From> {
+  template <typename To>
+  using type = volatile To;
+};
+
+template <typename From>
+struct CopyCVImpl<const volatile From> {
+  template <typename To>
+  using type = const volatile To;
+};
+
+}  // namespace details
+
+template <typename From, typename To>
+using CopyCVT = typename details::CopyCVImpl<
+    std::remove_reference_t<From>>::template type<std::remove_reference_t<To>>;
+
 template <typename T, template <typename...> typename Template>
 struct IsTypeSpecOf {
   static constexpr const bool value =

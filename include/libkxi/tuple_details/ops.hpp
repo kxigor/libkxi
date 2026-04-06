@@ -12,17 +12,17 @@ namespace kxi::tuple {
 
 template <std::size_t I, typename T, concepts::Tuple TupleT>
 constexpr decltype(auto) Get(TupleT&& tuple) {
-  return std::forward<Tuple>(tuple).template Get<I, T>();
+  return std::forward<TupleT>(tuple).template Get<I, T>();
 }
 
 template <std::size_t I, concepts::Tuple TupleT>
 constexpr decltype(auto) Get(TupleT&& tuple) {
-  return std::forward<Tuple>(tuple).template Get<I>();
+  return std::forward<TupleT>(tuple).template Get<I>();
 }
 
 template <typename T, concepts::Tuple TupleT>
 constexpr decltype(auto) Get(TupleT&& tuple) {
-  return std::forward<Tuple>(tuple).template Get<T>();
+  return std::forward<TupleT>(tuple).template Get<T>();
 }
 
 template <concepts::Tuple TupleT>

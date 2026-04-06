@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+
 #include <libkxi/type_list.hpp>
 
 namespace {
