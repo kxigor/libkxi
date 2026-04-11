@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 
-#include <libkxi/heterogeneous.hpp>
+#include <libkxi/meta.hpp>
 #include <tuple>
 #include <utility>
 
 namespace {
 
-using kxi::het::IsHeterogeneousV;
+using kxi::meta::IsHeterogeneousV;
 
 template <typename...>
 struct TList {};

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <libkxi/heterogeneous.hpp>
+#include <libkxi/meta.hpp>
 
-namespace kxi::het {
+namespace kxi::meta {
 template <typename... Args>
 struct Types {};
 
@@ -15,6 +15,6 @@ inline constexpr const auto IsTypesV = IsTypes<Args...>::value;
 namespace concepts {
 template <typename... Args>
 concept Types = IsTypesV<Args...>;
-}
+}  // namespace concepts
 
-}  // namespace kxi::het
+}  // namespace kxi::meta

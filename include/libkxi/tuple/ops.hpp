@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstddef>
-#include <libkxi/heterogeneous.hpp>
+#include <libkxi/meta.hpp>
 #include <libkxi/tuple/core.hpp>
 #include <libkxi/tuple/fwd.hpp>
 #include <libkxi/tuple/ops_details.hpp>
@@ -35,9 +35,9 @@ constexpr void Swap(TupleT& lhs, TupleT& rhs) noexcept(
 template <std::size_t I, concepts::FlatTuple... TuplesT>
 constexpr decltype(auto) FlatGet(TuplesT&&... tuples) {
   using FlatGetHelperT = details::FlatGetHelper<TuplesT...>;
-  using TupleOfTuplesT = FlatGetHelperT::TupleOfTuplesT;
+  using RefsTupleT = FlatGetHelperT::RefsTupleT;
 
-  TupleOfTuplesT tuple_of_tuples{tuples...};
+  RefsTupleT tuple_of_tuples{tuples...};
   return FlatGetHelperT::template Get<I>(tuple_of_tuples);
 }
 
@@ -56,16 +56,16 @@ constexpr auto MakeTuple(Args&&... args) {
 template <concepts::FlatTuple... TuplesT>
 constexpr auto TupleCat(TuplesT&&... tuples) {
   using FlatGetHelperT = details::FlatGetHelper<TuplesT...>;
-  using TupleOfTuplesT = FlatGetHelperT::TupleOfTuplesT;
-  using ResultType = FlatGetHelperT::TypeListOfAllTypes;
+  using RefsTupleT = FlatGetHelperT::RefsTupleT;
+  using ResultType = FlatGetHelperT::MergedPackT;
 
-  TupleOfTuplesT tuple_of_tuples{tuples...};
+  RefsTupleT tuple_of_tuples{tuples...};
 
   return
       [&]<std::size_t... Indexes>(std::index_sequence<Indexes...> /*unused*/) {
         return ResultType{
             FlatGetHelperT::template Get<Indexes>(tuple_of_tuples)...};
-      }(std::make_index_sequence<FlatGetHelperT::kNumberOfAllTypes>{});
+      }(std::make_index_sequence<FlatGetHelperT::kTotalSize>{});
 }
 
 template <typename... Args>

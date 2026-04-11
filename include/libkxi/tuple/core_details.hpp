@@ -1,5 +1,5 @@
 #include <cstddef>
-#include <libkxi/heterogeneous.hpp>
+#include <libkxi/meta.hpp>
 #include <libkxi/types.hpp>
 #include <libkxi/utility.hpp>
 #include <type_traits>
@@ -8,17 +8,17 @@
 namespace kxi::tuple::details {
 
 template <utility::concepts::IndexSequence IndexesCortage,
-          het::concepts::Types TypesCortage>
+          meta::concepts::Types TypesCortage>
 
 struct FlatTupleImpl;
 
 template <std::size_t... Indexes, typename... Types>
-class FlatTupleImpl<std::index_sequence<Indexes...>, het::Types<Types...>>
+class FlatTupleImpl<std::index_sequence<Indexes...>, meta::Types<Types...>>
     : utility::IndexedType<Indexes, Types>... {
   /*====================== Usings/Helpers ======================*/
  private:
   using IndexesCortage = std::index_sequence<Indexes...>;
-  using TypesCortage = het::Types<Types...>;
+  using TypesCortage = meta::Types<Types...>;
 
   /*================= Constructors/Destructors =================*/
  public:
@@ -51,13 +51,13 @@ class FlatTupleImpl<std::index_sequence<Indexes...>, het::Types<Types...>>
   template <std::size_t I, typename Self>
   constexpr decltype(auto) Get(this Self&& self) {
     return std::forward<Self>(self)
-        .template Get<I, het::GetTypeT<het::Types, I, TypesCortage>>();
+        .template Get<I, meta::GetTypeT<meta::Types, I, TypesCortage>>();
   }
 
   template <typename T, typename Self>
   constexpr decltype(auto) Get(this Self&& self) {
     return std::forward<Self>(self)
-        .template Get<het::GetIndexV<het::Types, T, TypesCortage>>();
+        .template Get<meta::GetIndexV<meta::Types, T, TypesCortage>>();
   }
 
   constexpr void Swap(FlatTupleImpl& other) noexcept(

@@ -1,16 +1,16 @@
 #include <gtest/gtest.h>
 
-#include <libkxi/heterogeneous.hpp>
+#include <libkxi/meta.hpp>
 #include <type_traits>
 
 namespace {
 
-using kxi::het::CatListsT;
-using kxi::het::GetCount;
-using kxi::het::GetDestinationPosV;
-using kxi::het::GetIndexV;
-using kxi::het::GetSizeV;
-using kxi::het::GetTypeT;
+using kxi::meta::CatListsT;
+using kxi::meta::GetCount;
+using kxi::meta::GetDestinationPosV;
+using kxi::meta::GetIndexV;
+using kxi::meta::GetSizeV;
+using kxi::meta::GetTypeT;
 
 template <typename...>
 struct TList {};

@@ -8,11 +8,11 @@ namespace kxi::tuple {
 template <typename... Args>
 class FlatTuple
     : public details::FlatTupleImpl<std::make_index_sequence<sizeof...(Args)>,
-                                    het::Types<Args...>> {
+                                    meta::Types<Args...>> {
   /*====================== Usings/Helpers ======================*/
   using BaseT =
       details::FlatTupleImpl<std::make_index_sequence<sizeof...(Args)>,
-                             het::Types<Args...>>;
+                             meta::Types<Args...>>;
   using BaseT::BaseT;
 };
 

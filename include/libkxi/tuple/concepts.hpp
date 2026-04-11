@@ -1,19 +1,19 @@
 #pragma once
 
-#include <libkxi/heterogeneous.hpp>
+#include <libkxi/meta.hpp>
 #include <libkxi/tuple/fwd.hpp>
 
 namespace kxi::tuple {
 
 template <typename T>
-struct IsTuple : het::IsHeterogeneous<FlatTuple, T> {};
+struct IsFlatTuple : meta::IsHeterogeneous<FlatTuple, T> {};
 
 template <typename T>
-constexpr const bool IsTupleV = IsTuple<T>::value;
+constexpr const bool IsFlatTupleV = IsFlatTuple<T>::value;
 
 namespace concepts {
 template <typename T>
-concept FlatTuple = IsTupleV<T>;
+concept FlatTuple = IsFlatTupleV<T>;
 }  // namespace concepts
 
 }  // namespace kxi::tuple

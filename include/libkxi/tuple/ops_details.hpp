@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstddef>
-#include <libkxi/heterogeneous.hpp>
+#include <libkxi/meta.hpp>
 #include <libkxi/tuple/concepts.hpp>
 #include <libkxi/tuple/core.hpp>
 #include <libkxi/tuple/fwd.hpp>
@@ -11,23 +11,21 @@
 namespace kxi::tuple::details {
 template <concepts::FlatTuple... TuplesT>
 struct FlatGetHelper {
-  using TypeListOfAllTypes = het::CatListsT<FlatTuple, TuplesT...>;
-  static constexpr const std::size_t kNumberOfAllTypes =
-      het::GetSizeV<FlatTuple, TypeListOfAllTypes>;
+  using MergedPackT = meta::CatListsT<FlatTuple, TuplesT...>;
+  using RefsTupleT = FlatTuple<std::remove_reference_t<TuplesT>&...>;
 
-  using TupleOfTuplesT = FlatTuple<std::remove_reference_t<TuplesT>&...>;
+  static constexpr auto kTotalSize = meta::GetSizeV<FlatTuple, MergedPackT>;
 
   template <std::size_t I>
-  static constexpr decltype(auto) Get(TupleOfTuplesT& tuple_of_tuples) {
-    static constexpr const auto kDestinationPos =
-        het::GetDestinationPosV<FlatTuple, I, TuplesT...>;
+  static constexpr decltype(auto) Get(RefsTupleT& refs) {
+    static constexpr auto kPos =
+        meta::GetDestinationPosV<FlatTuple, I, TuplesT...>;
 
-    using NecessaryTupleT = het::GetTypeT<FlatTuple, kDestinationPos.list_pos,
-                                          FlatTuple<TuplesT...>>;
+    using TargetTupleT =
+        meta::GetTypeT<FlatTuple, kPos.list_pos, FlatTuple<TuplesT...>>;
 
-    return std::forward<NecessaryTupleT>(
-               tuple_of_tuples.template Get<kDestinationPos.list_pos>())
-        .template Get<kDestinationPos.elem_pos>();
+    return std::forward<TargetTupleT>(refs.template Get<kPos.list_pos>())
+        .template Get<kPos.elem_pos>();
   }
 };
 };  // namespace kxi::tuple::details
