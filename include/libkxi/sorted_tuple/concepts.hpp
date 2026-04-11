@@ -1,9 +1,9 @@
 #pragma once
 
-#include <libkxi/sorted_tuple_details/fwd.hpp>
+#include <libkxi/sorted_tuple/fwd.hpp>
 #include <libkxi/utility.hpp>
 
-namespace kxi::sorted_tuple {
+namespace kxi::tuple {
 
 namespace details {
 template <typename T>
@@ -29,4 +29,4 @@ template <typename T>
 concept SortedTuple = IsSortedTupleSpecV<T>;
 }  // namespace concepts
 
-};  // namespace kxi::sorted_tuple
+};  // namespace kxi::tuple

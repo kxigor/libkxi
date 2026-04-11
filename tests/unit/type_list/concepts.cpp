@@ -1,23 +1,31 @@
 #include <gtest/gtest.h>
 
-#include <libkxi/type_list.hpp>
+#include <libkxi/heterogeneous.hpp>
+#include <tuple>
+#include <utility>
 
 namespace {
 
-using kxi::type_list::IsTypeListSpecV;
-using kxi::type_list::TypeList;
+using kxi::het::IsHeterogeneousV;
 
-TEST(TypeListConcepts, TypeListSpecIsDetected) {
-  EXPECT_TRUE(IsTypeListSpecV<TypeList<>>);
-  EXPECT_TRUE(IsTypeListSpecV<TypeList<int>>);
-  EXPECT_TRUE((IsTypeListSpecV<TypeList<int, double, char>>));
+template <typename...>
+struct TList {};
+
+TEST(HeterogeneousConcepts, SpecIsDetected) {
+  EXPECT_TRUE((IsHeterogeneousV<TList, TList<>>));
+  EXPECT_TRUE((IsHeterogeneousV<TList, TList<int>>));
+  EXPECT_TRUE((IsHeterogeneousV<TList, TList<int, double, char>>));
+
+  EXPECT_TRUE((IsHeterogeneousV<std::tuple, std::tuple<int, float>>));
 }
 
-TEST(TypeListConcepts, NonTypeListSpecIsRejected) {
-  EXPECT_FALSE(IsTypeListSpecV<int>);
-  EXPECT_FALSE(IsTypeListSpecV<double>);
-  EXPECT_FALSE(IsTypeListSpecV<void>);
-  EXPECT_FALSE((IsTypeListSpecV<std::pair<int, double>>));
+TEST(HeterogeneousConcepts, NonSpecIsRejected) {
+  EXPECT_FALSE((IsHeterogeneousV<TList, int>));
+  EXPECT_FALSE((IsHeterogeneousV<TList, double>));
+  EXPECT_FALSE((IsHeterogeneousV<TList, void>));
+  EXPECT_FALSE((IsHeterogeneousV<TList, std::pair<int, double>>));
+
+  EXPECT_FALSE((IsHeterogeneousV<TList, std::tuple<int, double>>));
 }
 
 }  // namespace

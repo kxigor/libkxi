@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstddef>
-#include <libkxi/utility_details/core_details.hpp>
 #include <type_traits>
 #include <utility>
 
@@ -51,24 +50,6 @@ template <typename From, typename To>
 using CopyCVT = typename details::CopyCVImpl<
     std::remove_reference_t<From>>::template type<std::remove_reference_t<To>>;
 
-template <typename T, template <typename...> typename Template>
-struct IsTypeSpecOf {
-  static constexpr const bool value =
-      details::IsTypeSpecOfImpl<std::remove_cvref_t<T>, Template>::value;
-};
-
-template <typename T, template <typename...> typename Template>
-constexpr const bool IsTypeSpecOfV = IsTypeSpecOf<T, Template>::value;
-
-template <typename T, template <auto...> typename Template>
-struct IsValueSpecOf {
-  static constexpr const bool value =
-      details::IsValueSpecOfImpl<T, Template>::value;
-};
-
-template <typename T, template <auto...> typename Template>
-constexpr const bool IsValueSpecOfV = IsValueSpecOf<T, Template>::value;
-
 template <typename T>
 struct IsIndexSequence : std::false_type {
   static constexpr const bool value = false;
@@ -92,5 +73,45 @@ template <typename T>
 concept IndexSequence = IsIndexSequenceV<T>;
 
 }  // namespace concepts
+
+template <std::size_t I, typename T>
+struct IndexedType {
+ public:
+  /*===================== Usings/Constants =====================*/
+  static constexpr std::size_t kHolderNumber = I;
+  using ValueT = T;
+
+  /*================= Constructors/Destructors =================*/
+  constexpr IndexedType() = default;
+
+  constexpr IndexedType(const IndexedType& /*unused*/) = default;
+
+  constexpr IndexedType(IndexedType&& /*unused*/) = default;
+
+  template <typename... Args>
+  requires utility::concepts::PerfectCtorGuard<IndexedType, Args...> &&
+           std::is_constructible_v<ValueT, Args...>
+  constexpr IndexedType(Args&&... args) : value_(std::forward<Args>(args)...) {}
+
+  constexpr ~IndexedType() = default;
+
+  /*======================= Assignments ========================*/
+  constexpr IndexedType& operator=(const IndexedType& /*unused*/) = default;
+
+  constexpr IndexedType& operator=(IndexedType&& /*unused*/) = default;
+
+  /*========================= Getters ==========================*/
+  ValueT& Value() { return value_; }
+
+  const ValueT& Value() const { return value_; }
+
+  volatile ValueT& Value() volatile { return value_; }
+
+  const volatile ValueT& Value() const volatile { return value_; }
+
+ private:
+  /*======================= Data fields ========================*/
+  ValueT value_{};
+};
 
 }  // namespace kxi::utility

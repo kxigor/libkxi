@@ -12,13 +12,6 @@ add_gtest(UnitTypeList_Core
     libkxi
 )
 
-add_gtest(UnitTypeList_TupleOps
-  SOURCES tuple_ops.cpp
-  LIBRARIES 
-    project_coverage
-    libkxi
-)
-
 add_gtest(UnitTypeList_Sort
   SOURCES sort.cpp
   LIBRARIES 

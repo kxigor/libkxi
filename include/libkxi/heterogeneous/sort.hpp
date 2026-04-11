@@ -2,21 +2,22 @@
 
 #include <array>
 #include <cstddef>
-#include <libkxi/type_list_details/concepts.hpp>
-#include <libkxi/type_list_details/core.hpp>
-#include <libkxi/type_list_details/fwd.hpp>
+#include <libkxi/heterogeneous/concepts.hpp>
+#include <libkxi/heterogeneous/core.hpp>
 #include <libkxi/utility.hpp>
 #include <numeric>
 
-namespace kxi::type_list {
+namespace kxi::het {
 
-template <template <typename LHS, typename RHS> typename PredicatT,
-          concepts::TypeList TypeListT>
+template <template <typename...> typename Container,
+          template <typename LHS, typename RHS> typename PredicatT,
+          typename Heterogeneous>
 struct Sort {
  public:
-  static constexpr const std::size_t kNumOfTypes = GetSizeV<TypeListT>;
+  static constexpr const std::size_t kNumOfTypes =
+      GetSizeV<Container, Heterogeneous>;
   using MappingArrayT = std::array<std::size_t, kNumOfTypes>;
-  using GivenTypeListT = TypeListT;
+  using GivenTypeListT = Heterogeneous;
 
   template <typename T, std::size_t Size>
   using CompareTableContainerT = std::array<T, Size>;
@@ -27,8 +28,9 @@ struct Sort {
   [[nodiscard]] static constexpr auto GetCompareTable() noexcept {
     return []<std::size_t... Is>(std::index_sequence<Is...>) {
       return CompareTableT{([]<std::size_t Idx>() {
-        return CompareLineT{PredicatT<GetTypeT<Idx, GivenTypeListT>,
-                                      GetTypeT<Is, GivenTypeListT>>::value...};
+        return CompareLineT{
+            PredicatT<het::GetTypeT<Container, Idx, GivenTypeListT>,
+                      het::GetTypeT<Container, Is, GivenTypeListT>>::value...};
       }.template operator()<Is>())...};
     }(std::make_index_sequence<kNumOfTypes>{});
   }
@@ -72,8 +74,9 @@ struct Sort {
 
   using SortedTypeListT =
       decltype([]<std::size_t... Is>(std::index_sequence<Is...>) {
-        return TypeList<GetTypeT<kMappingArray[Is], GivenTypeListT>...>{};
+        return Container<
+            het::GetTypeT<Container, kMappingArray[Is], GivenTypeListT>...>{};
       }(std::make_index_sequence<kNumOfTypes>{}));
 };
 
-}  // namespace kxi::type_list
+}  // namespace kxi::het

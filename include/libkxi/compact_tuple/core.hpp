@@ -2,13 +2,13 @@
 
 #include <libkxi/sorted_tuple.hpp>
 
-namespace kxi::compact_tuple {
+namespace kxi::tuple {
 
 /*TODO: impl*/
 template <typename LHS, typename RHS>
 struct CompactPredicat;
 
 template <typename... Args>
-using CompactTuple = sorted_tuple::SortedTuple<CompactPredicat, Args...>;
+using CompactTuple = tuple::SortedTuple<CompactPredicat, Args...>;
 
-};  // namespace kxi::compact_tuple
+};  // namespace kxi::tuple
