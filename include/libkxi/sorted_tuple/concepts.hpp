@@ -10,6 +10,7 @@ template <typename T>
 struct IsSortedTupleSpecImpl {
   static constexpr const bool value = false;
 };
+
 template <template <typename LHS, typename RHS> typename Predicat,
           typename... Args>
 struct IsSortedTupleSpecImpl<SortedTuple<Predicat, Args...>> {

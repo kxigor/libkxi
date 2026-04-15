@@ -41,28 +41,29 @@ class FlatTupleImpl<std::index_sequence<Indexes...>, meta::Types<Types...>>
   constexpr FlatTupleImpl& operator=(FlatTupleImpl&& /*unused*/) = default;
 
   /*======================== Interface =========================*/
-  template <std::size_t I, typename T, typename Self>
-  constexpr decltype(auto) Get(this Self&& self) {
-    using BaseT = kxi::utility::CopyCVT<Self, utility::IndexedType<I, T>>;
-
-    return std::forward_like<Self>(static_cast<BaseT&>(self).Value());
-  }
-
   template <std::size_t I, typename Self>
   constexpr decltype(auto) Get(this Self&& self) {
     return std::forward<Self>(self)
-        .template Get<I, meta::GetTypeT<meta::Types, I, TypesCortage>>();
+        .template Get<I, meta::GetTypeT<I, TypesCortage>>();
   }
 
   template <typename T, typename Self>
   constexpr decltype(auto) Get(this Self&& self) {
     return std::forward<Self>(self)
-        .template Get<meta::GetIndexV<meta::Types, T, TypesCortage>>();
+        .template Get<meta::GetIndexV<T, TypesCortage>>();
   }
 
   constexpr void Swap(FlatTupleImpl& other) noexcept(
       (std::is_nothrow_swappable_v<Types> && ...)) {
     (std::swap(Get<Indexes>(), other.Get<Indexes>()), ...);
+  }
+
+  /*========================== Impls ===========================*/
+ private:
+  template <std::size_t I, typename T, typename Self>
+  constexpr decltype(auto) Get(this Self&& self) {
+    using BaseT = kxi::utility::CopyCVT<Self, utility::IndexedType<I, T>>;
+    return std::forward_like<Self>(static_cast<BaseT&>(self).Value());
   }
 };
 

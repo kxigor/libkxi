@@ -11,7 +11,7 @@ template <template <typename LHS, typename RHS> typename Predicat,
 class SortedTuple {
  private:
   /*========================== Usings ==========================*/
-  using SorterT = meta::Sort<FlatTuple, Predicat, FlatTuple<Types...>>;
+  using SorterT = meta::Sort<Predicat, FlatTuple<Types...>>;
   using BaseTupleT = typename SorterT::SortedShellT;
 
  public:
@@ -35,8 +35,8 @@ class SortedTuple {
 
               SavedArgsTupleT tuple_args{args...};
 
-              return BaseTupleT{std::forward<meta::GetTypeT<
-                  meta::Types, SorterT::kPermutation[Is], ArgsTypeListT>>(
+              return BaseTupleT{std::forward<
+                  meta::GetTypeT<SorterT::kPermutation[Is], ArgsTypeListT>>(
                   tuple_args.template Get<SorterT::kPermutation[Is]>())...};
             }(std::make_index_sequence<sizeof...(Args)>{})) {}
 

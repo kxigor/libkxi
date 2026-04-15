@@ -11,11 +11,6 @@
 
 namespace kxi::tuple {
 
-template <std::size_t I, typename T, concepts::FlatTuple TupleT>
-constexpr decltype(auto) Get(TupleT&& tuple) {
-  return std::forward<TupleT>(tuple).template Get<I, T>();
-}
-
 template <std::size_t I, concepts::FlatTuple TupleT>
 constexpr decltype(auto) Get(TupleT&& tuple) {
   return std::forward<TupleT>(tuple).template Get<I>();

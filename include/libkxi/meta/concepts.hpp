@@ -24,4 +24,29 @@ template <template <typename...> typename Shell, typename T>
 concept Heterogeneous = IsHeterogeneousV<Shell, T>;
 }  // namespace concepts
 
+namespace details {
+template <typename...>
+struct PackTester {};
+
+template <typename, typename = void>
+struct IsVariadicInstanceImpl : std::false_type {};
+
+template <template <typename...> typename Shell, typename... Args>
+struct IsVariadicInstanceImpl<
+    Shell<Args...>, std::void_t<Shell<PackTester<>, PackTester<Args>...>>>
+    : std::true_type {};
+}  // namespace details
+
+template <typename T>
+struct IsVariadicInstance
+    : details::IsVariadicInstanceImpl<std::remove_cvref_t<T>> {};
+
+template <typename T>
+inline constexpr bool IsVariadicInstanceV = IsVariadicInstance<T>::value;
+
+namespace concepts {
+template <typename T>
+concept VariadicInstance = IsVariadicInstanceV<T>;
+}  // namespace concepts
+
 };  // namespace kxi::meta

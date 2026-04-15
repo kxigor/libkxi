@@ -7,14 +7,14 @@
 
 namespace kxi::tuple {
 template <concepts::FlatTuple TupleT>
-struct TupleSize : meta::GetSize<FlatTuple, TupleT> {};
+struct TupleSize : meta::GetSize<TupleT> {};
 
 template <concepts::FlatTuple TupleT>
 constexpr const std::size_t TupleSizeV = TupleSize<TupleT>::value;
 
 template <std::size_t I, concepts::FlatTuple TupleT>
-struct TupleElement : meta::GetType<FlatTuple, I, TupleT> {
-  using typename meta::GetType<FlatTuple, I, TupleT>::type;
+struct TupleElement : meta::GetType<I, TupleT> {
+  using typename meta::GetType<I, TupleT>::type;
 };
 
 template <std::size_t I, concepts::FlatTuple TupleT>

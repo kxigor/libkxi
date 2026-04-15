@@ -26,7 +26,7 @@ struct SizeofGreater {
 
 TEST(HeterogeneousSort, CompareTableValues) {
   using Input = TList<char, int, double>;
-  using SortInfo = Sort<TList, SizeofLess, Input>;
+  using SortInfo = Sort<SizeofLess, Input>;
 
   EXPECT_FALSE(SortInfo::kRelations[0][0]);
   EXPECT_TRUE(SortInfo::kRelations[0][1]);
@@ -45,7 +45,7 @@ TEST(HeterogeneousSort, CompareTableValues) {
 
 TEST(HeterogeneousSort, MappingArrayReversed) {
   using Input = TList<double, int, char>;
-  using SortInfo = Sort<TList, SizeofLess, Input>;
+  using SortInfo = Sort<SizeofLess, Input>;
 
   EXPECT_EQ(SortInfo::kPermutation.size(), 3u);
   EXPECT_EQ(SortInfo::kPermutation[0], 2u);
@@ -55,7 +55,7 @@ TEST(HeterogeneousSort, MappingArrayReversed) {
 
 TEST(HeterogeneousSort, MappingArrayFiveElements) {
   using Input = TList<double, std::int32_t, std::int8_t, float, std::int16_t>;
-  using SortInfo = Sort<TList, SizeofLess, Input>;
+  using SortInfo = Sort<SizeofLess, Input>;
 
   EXPECT_EQ(SortInfo::kPermutation.size(), 5u);
   EXPECT_EQ(SortInfo::kPermutation[0], 2u);
@@ -69,31 +69,31 @@ TEST(HeterogeneousSort, MappingArrayFiveElements) {
 
 TEST(HeterogeneousSort, InverseMappingReversed) {
   using Input = TList<double, int, char>;
-  using SortInfo = Sort<TList, SizeofLess, Input>;
+  using SortInfo = Sort<SizeofLess, Input>;
 
   EXPECT_EQ(SortInfo::kInversePermutation.size(), 3u);
-  EXPECT_EQ(SortInfo::kInversePermutation[0], 2u); 
-  EXPECT_EQ(SortInfo::kInversePermutation[1], 1u); 
-  EXPECT_EQ(SortInfo::kInversePermutation[2], 0u); 
+  EXPECT_EQ(SortInfo::kInversePermutation[0], 2u);
+  EXPECT_EQ(SortInfo::kInversePermutation[1], 1u);
+  EXPECT_EQ(SortInfo::kInversePermutation[2], 0u);
 }
 
 // --- SortedShellT ---
 
 TEST(HeterogeneousSort, AscendingBySizeof) {
   using Input = TList<double, char, int>;
-  using Sorted = Sort<TList, SizeofLess, Input>::SortedShellT;
+  using Sorted = Sort<SizeofLess, Input>::SortedShellT;
   EXPECT_TRUE((std::is_same_v<Sorted, TList<char, int, double>>));
 }
 
 TEST(HeterogeneousSort, DescendingBySizeof) {
   using Input = TList<char, double, int>;
-  using Sorted = Sort<TList, SizeofGreater, Input>::SortedShellT;
+  using Sorted = Sort<SizeofGreater, Input>::SortedShellT;
   EXPECT_TRUE((std::is_same_v<Sorted, TList<double, int, char>>));
 }
 
 TEST(HeterogeneousSort, StabilityEqualSizes) {
   using Input = TList<int, float>;
-  using Sorted = Sort<TList, SizeofLess, Input>::SortedShellT;
+  using Sorted = Sort<SizeofLess, Input>::SortedShellT;
   EXPECT_TRUE((std::is_same_v<Sorted, TList<int, float>>));
 }
 
