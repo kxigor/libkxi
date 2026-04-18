@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstddef>
-#include <libkxi/meta.hpp>
+#include <libkxi/meta.hpp>  // IWYU pragma: keep
 #include <libkxi/types.hpp>
 #include <libkxi/utility.hpp>
 #include <type_traits>

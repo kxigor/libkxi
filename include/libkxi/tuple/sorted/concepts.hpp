@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libkxi/utility.hpp>
+#include <type_traits>
 
 #include "fwd.hpp"
 

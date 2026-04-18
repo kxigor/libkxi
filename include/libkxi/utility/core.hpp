@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstddef>
-#include <libkxi/traits.hpp>
 #include <type_traits>
 #include <utility>
 
@@ -52,7 +51,7 @@ using CopyCVT = typename details::CopyCVImpl<
     std::remove_reference_t<From>>::template type<std::remove_reference_t<To>>;
 
 template <typename T>
-struct IsIndexSequence : traits::FalseType {
+struct IsIndexSequence : std::false_type {
   static constexpr const bool value = false;
 };
 

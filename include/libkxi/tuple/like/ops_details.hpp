@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../flat/core.hpp"
-#include "../flat/fwd.hpp"
+#include <libkxi/meta.hpp>  // IWYU pragma: keep
+
 #include "concepts.hpp"
 
 namespace kxi::tuple::like::details {

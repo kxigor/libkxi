@@ -71,7 +71,7 @@ inline constexpr std::size_t CountV = Count<T, TList>::value;
 
 namespace details {
 template <typename TList>
-struct IsDistinctImpl : traits::FalseType {};
+struct IsDistinctImpl : std::true_type {};
 
 template <template <typename...> typename Shell, typename... Types>
 struct IsDistinctImpl<Shell<Types...>> {
@@ -189,21 +189,93 @@ using Rebind = details::RebindImpl<std::remove_cvref_t<TList>, Shell>;
 template <typename TList, template <typename...> typename Shell>
 using RebindT = Rebind<TList, Shell>::type;
 
+template <template <typename...> typename Template>
+struct TemplateHolder {
+  template <typename... Types>
+  using type = Template<Types...>;
+};
+
 namespace details {
 template <typename TList>
 struct UnbindImpl;
 
 template <template <typename...> typename Shell, typename... Types>
 struct UnbindImpl<Shell<Types...>> {
-  template <typename... NewTypes>
-  using type = Shell<NewTypes...>;
+  using type = TemplateHolder<Shell>;
 };
 };  // namespace details
 
 template <concepts::VariadicTemplate TList>
 using Unbind = details::UnbindImpl<TList>;
 
-template <concepts::VariadicTemplate TList, typename... NewTypes>
-using UnbindT = typename Unbind<TList>::template type<NewTypes...>;
+template <concepts::VariadicTemplate TList>
+using UnbindT = Unbind<TList>::type;
+
+template <typename... Types>
+struct IsAllSameTypes : std::true_type {};
+
+template <typename T, typename... Types>
+struct IsAllSameTypes<T, Types...>
+    : std::integral_constant<bool, (std::is_same_v<T, Types> && ...)> {};
+
+template <typename... Types>
+inline constexpr auto IsAllSameTypesV = IsAllSameTypes<Types...>::value;
+
+template <template <typename...> typename FirstTemplate,
+          template <typename...> typename SecondTemplate>
+struct IsSameTemplate : std::is_same<TemplateHolder<FirstTemplate>,
+                                     TemplateHolder<SecondTemplate>> {};
+
+template <template <typename...> typename FirstTemplate,
+          template <typename...> typename SecondTemplate>
+inline constexpr auto IsSameTemplateV =
+    IsSameTemplate<FirstTemplate, SecondTemplate>::value;
+
+template <template <typename...> typename... Templates>
+struct IsAllSameTemplates : IsAllSameTypes<TemplateHolder<Templates...>> {};
+
+template <template <typename...> typename... Templates>
+inline constexpr auto IsAllSameTemplatesV =
+    IsAllSameTemplates<Templates...>::value;
+
+template <concepts::VariadicTemplate FirstTList,
+          concepts::VariadicTemplate SecondTList>
+struct IsSameShell : std::is_same<UnbindT<FirstTList>, UnbindT<SecondTList>> {};
+
+template <concepts::VariadicTemplate FirstTList,
+          concepts::VariadicTemplate SecondTList>
+inline constexpr auto IsSameShellV =
+    IsSameShell<FirstTList, SecondTList>::value;
+
+template <concepts::VariadicTemplate... TLists>
+struct IsAllSameShells : IsAllSameTypes<UnbindT<TLists>...> {};
+
+template <concepts::VariadicTemplate... TLists>
+inline constexpr auto IsAllSameShellsV = IsAllSameShells<TLists...>::value;
+
+namespace concepts {
+template <typename... Types>
+concept AllSameShells = IsAllSameShellsV<Types...>;
+}  // namespace concepts
+
+namespace details {
+template <typename... TList>
+struct UnbindSamePackImpl;
+
+template <template <typename...> typename Shell, typename... Types,
+          typename... OtherTLists>
+struct UnbindSamePackImpl<Shell<Types...>, OtherTLists...> {
+  using type = TemplateHolder<Shell>;
+};
+}  // namespace details
+
+template <concepts::VariadicTemplate... TLists>
+requires concepts::AllSameShells<TLists...>
+using UnbindSamePack =
+    details::UnbindSamePackImpl<std::remove_cvref_t<TLists>...>;
+
+template <concepts::VariadicTemplate... TLists>
+requires concepts::AllSameShells<TLists...>
+using UnbindSamePackT = UnbindSamePack<TLists...>::type;
 
 };  // namespace kxi::meta

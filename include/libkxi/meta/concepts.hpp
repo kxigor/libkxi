@@ -1,15 +1,15 @@
 #pragma once
 
-#include <libkxi/utility.hpp>
+#include <type_traits>
 
 namespace kxi::meta {
 
 namespace details {
 template <template <typename...> typename Shell, typename T>
-struct IsHeterogeneousImpl : traits::FalseType {};
+struct IsHeterogeneousImpl : std::false_type {};
 
 template <template <typename...> typename Shell, typename... Args>
-struct IsHeterogeneousImpl<Shell, Shell<Args...>> : traits::TrueType {};
+struct IsHeterogeneousImpl<Shell, Shell<Args...>> : std::true_type {};
 }  // namespace details
 
 template <template <typename...> typename Shell, typename T>
@@ -29,12 +29,12 @@ template <typename...>
 struct PackTester {};
 
 template <typename, typename = void>
-struct IsVariadicTemplateImpl : traits::FalseType {};
+struct IsVariadicTemplateImpl : std::false_type {};
 
 template <template <typename...> typename Shell, typename... Args>
 struct IsVariadicTemplateImpl<
     Shell<Args...>, std::void_t<Shell<PackTester<>, PackTester<Args>...>>>
-    : traits::TrueType {};
+    : std::true_type {};
 }  // namespace details
 
 template <typename T>
