@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstddef>
 #include <libkxi/meta.hpp>
 #include <libkxi/types.hpp>
@@ -5,7 +7,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace kxi::tuple::details {
+namespace kxi::tuple::flat::details {
 
 template <utility::concepts::IndexSequence IndexesCortage,
           meta::concepts::Types TypesCortage>
@@ -44,13 +46,13 @@ class FlatTupleImpl<std::index_sequence<Indexes...>, meta::Types<Types...>>
   template <std::size_t I, typename Self>
   constexpr decltype(auto) Get(this Self&& self) {
     return std::forward<Self>(self)
-        .template Get<I, meta::GetTypeT<I, TypesCortage>>();
+        .template Get<I, meta::TypeAtT<I, TypesCortage>>();
   }
 
   template <typename T, typename Self>
   constexpr decltype(auto) Get(this Self&& self) {
     return std::forward<Self>(self)
-        .template Get<meta::GetIndexV<T, TypesCortage>>();
+        .template Get<meta::IndexOfV<T, TypesCortage>>();
   }
 
   constexpr void Swap(FlatTupleImpl& other) noexcept(
@@ -67,4 +69,4 @@ class FlatTupleImpl<std::index_sequence<Indexes...>, meta::Types<Types...>>
   }
 };
 
-}  // namespace kxi::tuple::details
+}  // namespace kxi::tuple::flat::details

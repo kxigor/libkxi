@@ -6,7 +6,7 @@
 
 namespace {
 
-using kxi::meta::GetSizeV;
+using kxi::meta::SizeV;
 using kxi::meta::Sort;
 
 template <typename...>

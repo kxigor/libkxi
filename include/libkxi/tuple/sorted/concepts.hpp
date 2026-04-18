@@ -1,7 +1,8 @@
 #pragma once
 
-#include <libkxi/sorted_tuple/fwd.hpp>
 #include <libkxi/utility.hpp>
+
+#include "fwd.hpp"
 
 namespace kxi::tuple {
 

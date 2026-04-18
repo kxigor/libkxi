@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 
-#include <libkxi/tuple.hpp>
+#include <libkxi/tuple/flat.hpp>
 #include <utility>
 
 namespace {
 
-using kxi::tuple::IsFlatTupleV;
-using kxi::tuple::FlatTuple;
+using kxi::tuple::flat::IsFlatTupleV;
+using kxi::tuple::flat::FlatTuple;
 
 TEST(TupleConcepts, TupleSpecIsDetected) {
   EXPECT_TRUE(IsFlatTupleV<FlatTuple<>>);

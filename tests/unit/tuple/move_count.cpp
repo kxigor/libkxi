@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
 
 #include <cstddef>
-#include <libkxi/tuple.hpp>
+#include <libkxi/tuple/flat.hpp>
 #include <utility>
 
 namespace {
 
-using kxi::tuple::MakeTuple;
-using kxi::tuple::FlatTuple;
-using kxi::tuple::TupleCat;
+using kxi::tuple::flat::Make;
+using kxi::tuple::flat::FlatTuple;
+using kxi::tuple::flat::Cat;
 
 struct Counters {
   std::size_t default_ctor = 0;
@@ -133,29 +133,29 @@ TEST_F(TupleMoveCountingTest, TupleMoveAssign) {
   EXPECT_EQ(t2.template Get<0>().value, 10);
 }
 
-// --- MakeTuple from rvalue: exactly 1 move into tuple ---
+// --- Make from rvalue: exactly 1 move into tuple ---
 
 TEST_F(TupleMoveCountingTest, MakeTupleFromRvalue) {
   Tracked t(42);
   g_counters.Reset();
 
-  auto tup = MakeTuple(std::move(t));
+  auto tup = Make(std::move(t));
 
   // One move into the tuple element.
-  // MakeTuple may produce a prvalue (NRVO), so no extra move for the tuple
+  // Make may produce a prvalue (NRVO), so no extra move for the tuple
   // itself.
   EXPECT_EQ(g_counters.copy_ctor, 0u);
   EXPECT_GE(g_counters.move_ctor, 1u);
   EXPECT_EQ(tup.template Get<0>().value, 42);
 }
 
-// --- MakeTuple from lvalue: exactly 1 copy into tuple ---
+// --- Make from lvalue: exactly 1 copy into tuple ---
 
 TEST_F(TupleMoveCountingTest, MakeTupleFromLvalue) {
   Tracked t(42);
   g_counters.Reset();
 
-  auto tup = MakeTuple(t);
+  auto tup = Make(t);
 
   EXPECT_GE(g_counters.copy_ctor, 1u);
   EXPECT_EQ(tup.template Get<0>().value, 42);
@@ -230,14 +230,14 @@ TEST_F(TupleMoveCountingTest, TwoElementsSwap) {
   EXPECT_EQ(t2.template Get<1>().value, 2);
 }
 
-// --- TupleCat move counting ---
+// --- Cat move counting ---
 
 TEST_F(TupleMoveCountingTest, TupleCatFromRvalues) {
-  auto t1 = MakeTuple(Tracked(1));
-  auto t2 = MakeTuple(Tracked(2));
+  auto t1 = Make(Tracked(1));
+  auto t2 = Make(Tracked(2));
   g_counters.Reset();
 
-  auto result = TupleCat(std::move(t1), std::move(t2));
+  auto result = Cat(std::move(t1), std::move(t2));
 
   // Elements should be moved out of t1 and t2, not copied
   EXPECT_EQ(g_counters.copy_ctor, 0u);
@@ -247,11 +247,11 @@ TEST_F(TupleMoveCountingTest, TupleCatFromRvalues) {
 }
 
 TEST_F(TupleMoveCountingTest, TupleCatFromLvaluesCopies) {
-  auto t1 = MakeTuple(Tracked(1));
-  auto t2 = MakeTuple(Tracked(2));
+  auto t1 = Make(Tracked(1));
+  auto t2 = Make(Tracked(2));
   g_counters.Reset();
 
-  auto result = TupleCat(t1, t2);
+  auto result = Cat(t1, t2);
 
   // Elements should be copied from lvalue tuples
   EXPECT_EQ(g_counters.move_ctor, 0u);

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <cstdint>
-#include <libkxi/sorted_tuple.hpp>
+#include <libkxi/tuple/sorted.hpp>
 #include <string>
 #include <type_traits>
 #include <utility>

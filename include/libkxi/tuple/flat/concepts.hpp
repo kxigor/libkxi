@@ -1,9 +1,10 @@
 #pragma once
 
 #include <libkxi/meta.hpp>
-#include <libkxi/tuple/fwd.hpp>
 
-namespace kxi::tuple {
+#include "fwd.hpp"
+
+namespace kxi::tuple::flat {
 
 template <typename T>
 struct IsFlatTuple : meta::IsHeterogeneous<FlatTuple, T> {};
@@ -16,4 +17,4 @@ template <typename T>
 concept FlatTuple = IsFlatTupleV<T>;
 }  // namespace concepts
 
-}  // namespace kxi::tuple
+}  // namespace kxi::tuple::flat

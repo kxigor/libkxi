@@ -1,13 +1,14 @@
 #include <gtest/gtest.h>
 
-#include <libkxi/tuple.hpp>
+#include <libkxi/tuple/flat.hpp>
+#include <libkxi/tuple/like.hpp>
 #include <string>
 #include <type_traits>
 #include <utility>
 
 namespace {
 
-using kxi::tuple::FlatTuple;
+using kxi::tuple::flat::FlatTuple;
 
 // Helper: check that Get returns the expected qualified type
 // For member Get with explicit deducing this:
@@ -75,25 +76,25 @@ TEST(TupleQualifiers, GetByType_ConstRvalue) {
 
 TEST(TupleQualifiers, FreeGetByIndex_Lvalue) {
   FlatTuple<int, double> t(1, 2.0);
-  decltype(auto) v = kxi::tuple::Get<0>(t);
+  decltype(auto) v = kxi::tuple::like::Get<0>(t);
   EXPECT_TRUE((std::is_same_v<decltype(v), int&>));
 }
 
 TEST(TupleQualifiers, FreeGetByIndex_ConstLvalue) {
   const FlatTuple<int, double> t(1, 2.0);
-  decltype(auto) v = kxi::tuple::Get<0>(t);
+  decltype(auto) v = kxi::tuple::like::Get<0>(t);
   EXPECT_TRUE((std::is_same_v<decltype(v), const int&>));
 }
 
 TEST(TupleQualifiers, FreeGetByIndex_Rvalue) {
   FlatTuple<int, double> t(1, 2.0);
-  decltype(auto) v = kxi::tuple::Get<0>(std::move(t));
+  decltype(auto) v = kxi::tuple::like::Get<0>(std::move(t));
   EXPECT_TRUE((std::is_same_v<decltype(v), int&&>));
 }
 
 TEST(TupleQualifiers, FreeGetByIndex_ConstRvalue) {
   const FlatTuple<int, double> t(1, 2.0);
-  decltype(auto) v = kxi::tuple::Get<0>(std::move(t));
+  decltype(auto) v = kxi::tuple::like::Get<0>(std::move(t));
   EXPECT_TRUE((std::is_same_v<decltype(v), const int&&>));
 }
 
@@ -101,25 +102,25 @@ TEST(TupleQualifiers, FreeGetByIndex_ConstRvalue) {
 
 TEST(TupleQualifiers, FreeGetByType_Lvalue) {
   FlatTuple<int, double> t(1, 2.0);
-  decltype(auto) v = kxi::tuple::Get<int>(t);
+  decltype(auto) v = kxi::tuple::like::Get<int>(t);
   EXPECT_TRUE((std::is_same_v<decltype(v), int&>));
 }
 
 TEST(TupleQualifiers, FreeGetByType_ConstLvalue) {
   const FlatTuple<int, double> t(1, 2.0);
-  decltype(auto) v = kxi::tuple::Get<int>(t);
+  decltype(auto) v = kxi::tuple::like::Get<int>(t);
   EXPECT_TRUE((std::is_same_v<decltype(v), const int&>));
 }
 
 TEST(TupleQualifiers, FreeGetByType_Rvalue) {
   FlatTuple<int, double> t(1, 2.0);
-  decltype(auto) v = kxi::tuple::Get<int>(std::move(t));
+  decltype(auto) v = kxi::tuple::like::Get<int>(std::move(t));
   EXPECT_TRUE((std::is_same_v<decltype(v), int&&>));
 }
 
 TEST(TupleQualifiers, FreeGetByType_ConstRvalue) {
   const FlatTuple<int, double> t(1, 2.0);
-  decltype(auto) v = kxi::tuple::Get<int>(std::move(t));
+  decltype(auto) v = kxi::tuple::like::Get<int>(std::move(t));
   EXPECT_TRUE((std::is_same_v<decltype(v), const int&&>));
 }
 

@@ -1,8 +1,9 @@
 #pragma once
 
-#include <libkxi/compact_tuple/core.hpp>
 #include <libkxi/meta.hpp>
 #include <libkxi/utility.hpp>
+
+#include "core.hpp"
 
 namespace kxi::tuple {
 

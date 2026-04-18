@@ -1,10 +1,11 @@
 #pragma once
 
-#include <libkxi/tuple/core_details.hpp>
 #include <libkxi/types.hpp>
 #include <utility>
 
-namespace kxi::tuple {
+#include "core_details.hpp"
+
+namespace kxi::tuple::flat {
 template <typename... Args>
 class FlatTuple
     : public details::FlatTupleImpl<std::make_index_sequence<sizeof...(Args)>,
@@ -16,4 +17,4 @@ class FlatTuple
   using BaseT::BaseT;
 };
 
-}  // namespace kxi::tuple
+}  // namespace kxi::tuple::flat

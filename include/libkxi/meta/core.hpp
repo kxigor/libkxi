@@ -9,99 +9,120 @@
 namespace kxi::meta {
 
 namespace details {
-template <concepts::VariadicInstance TList>
-struct GetSizeImpl;
+template <typename TList>
+struct SizeImpl;
 
 template <template <typename...> typename Shell, typename... Types>
-struct GetSizeImpl<Shell<Types...>> : traits::SizeConstant<sizeof...(Types)> {};
+struct SizeImpl<Shell<Types...>> : traits::SizeConstant<sizeof...(Types)> {};
 }  // namespace details
 
-template <concepts::VariadicInstance TList>
-using GetSize = details::GetSizeImpl<std::remove_cvref_t<TList>>;
+template <concepts::VariadicTemplate TList>
+using Size = details::SizeImpl<std::remove_cvref_t<TList>>;
 
-template <concepts::VariadicInstance TList>
-inline constexpr std::size_t GetSizeV = GetSize<TList>::value;
+template <concepts::VariadicTemplate TList>
+inline constexpr std::size_t SizeV = Size<TList>::value;
 
 namespace details {
-template <std::size_t I, concepts::VariadicInstance TList>
-struct GetTypeImpl;
+template <std::size_t I, typename TList>
+struct TypeAtImpl;
 
 template <template <typename...> typename Shell, std::size_t I, typename Head,
           typename... Tail>
-struct GetTypeImpl<I, Shell<Head, Tail...>> {
-  using type = GetTypeImpl<I - 1, Shell<Tail...>>::type;
+struct TypeAtImpl<I, Shell<Head, Tail...>> {
+  using type = TypeAtImpl<I - 1, Shell<Tail...>>::type;
 };
 
 template <template <typename...> typename Shell, typename Head,
           typename... Tail>
-struct GetTypeImpl<0, Shell<Head, Tail...>> {
+struct TypeAtImpl<0, Shell<Head, Tail...>> {
   using type = Head;
 };
 }  // namespace details
 
-template <std::size_t I, concepts::VariadicInstance TList>
-using GetType = details::GetTypeImpl<I, std::remove_cvref_t<TList>>;
+template <std::size_t I, concepts::VariadicTemplate TList>
+using TypeAt = details::TypeAtImpl<I, std::remove_cvref_t<TList>>;
 
-template <std::size_t I, concepts::VariadicInstance TList>
-using GetTypeT = typename GetType<I, TList>::type;
+template <std::size_t I, concepts::VariadicTemplate TList>
+using TypeAtT = typename TypeAt<I, TList>::type;
 
 namespace details {
-template <typename T, concepts::VariadicInstance TList>
-struct GetCountImpl;
+template <typename T, typename TList>
+struct CountImpl;
 
 template <template <typename...> typename Shell, typename T, typename Head,
           typename... Tail>
-struct GetCountImpl<T, Shell<Head, Tail...>>
-    : traits::SizeConstant<GetCountImpl<T, Shell<Tail...>>::value> {};
+struct CountImpl<T, Shell<Head, Tail...>>
+    : traits::SizeConstant<CountImpl<T, Shell<Tail...>>::value> {};
 
 template <template <typename...> typename Shell, typename Head,
           typename... Tail>
-struct GetCountImpl<Head, Shell<Head, Tail...>>
-    : traits::SizeConstant<1 + GetCountImpl<Head, Shell<Tail...>>::value> {};
+struct CountImpl<Head, Shell<Head, Tail...>>
+    : traits::SizeConstant<1 + CountImpl<Head, Shell<Tail...>>::value> {};
 
 template <template <typename...> typename Shell, typename Head>
-struct GetCountImpl<Head, Shell<>> : traits::SizeConstant<0> {};
+struct CountImpl<Head, Shell<>> : traits::SizeConstant<0> {};
 }  // namespace details
 
-template <typename T, concepts::VariadicInstance TList>
-using GetCount = details::GetCountImpl<T, std::remove_cvref_t<TList>>;
+template <typename T, concepts::VariadicTemplate TList>
+using Count = details::CountImpl<T, std::remove_cvref_t<TList>>;
 
-template <typename T, concepts::VariadicInstance TList>
-inline constexpr std::size_t GetCountV = GetCount<T, TList>::value;
+template <typename T, concepts::VariadicTemplate TList>
+inline constexpr std::size_t CountV = Count<T, TList>::value;
 
 namespace details {
-template <typename T, concepts::VariadicInstance TList>
-struct GetIndexImpl;
+template <typename TList>
+struct IsDistinctImpl : traits::FalseType {};
+
+template <template <typename...> typename Shell, typename... Types>
+struct IsDistinctImpl<Shell<Types...>> {
+  using TList = Shell<Types...>;
+  static constexpr bool value = ((CountV<Types, TList> == 1) && ...);
+};
+};  // namespace details
+
+template <concepts::VariadicTemplate TList>
+using IsDistinct = details::IsDistinctImpl<std::remove_cvref_t<TList>>;
+
+template <concepts::VariadicTemplate TList>
+inline constexpr auto IsDistinctV = IsDistinct<TList>::value;
+
+namespace concepts {
+template <typename TList>
+concept Distinct = IsDistinctV<TList>;
+};  // namespace concepts
+
+namespace details {
+template <typename T, typename TList>
+struct IndexOfImpl;
 
 template <template <typename...> typename Shell, typename T, typename Head,
           typename... Tail>
-struct GetIndexImpl<T, Shell<Head, Tail...>>
-    : traits::SizeConstant<1 + GetIndexImpl<T, Shell<Tail...>>::value> {};
+struct IndexOfImpl<T, Shell<Head, Tail...>>
+    : traits::SizeConstant<1 + IndexOfImpl<T, Shell<Tail...>>::value> {};
 
 template <template <typename...> typename Shell, typename Head,
           typename... Tail>
-struct GetIndexImpl<Head, Shell<Head, Tail...>> : traits::SizeConstant<0> {};
+struct IndexOfImpl<Head, Shell<Head, Tail...>> : traits::SizeConstant<0> {};
 }  // namespace details
 
-template <typename T, concepts::VariadicInstance TList>
-requires(GetCount<T, TList>::value == 1)
-using GetIndex = details::GetIndexImpl<T, std::remove_cvref_t<TList>>;
+template <typename T, concepts::Distinct TList>
+using IndexOf = details::IndexOfImpl<T, std::remove_cvref_t<TList>>;
 
-template <typename T, concepts::VariadicInstance TList>
-inline constexpr const std::size_t GetIndexV = GetIndex<T, TList>::value;
+template <typename T, concepts::Distinct TList>
+inline constexpr const std::size_t IndexOfV = IndexOf<T, TList>::value;
 
 namespace details {
-template <std::size_t I, concepts::VariadicInstance... TLists>
-struct GetDestinationPosImpl {
+template <std::size_t I, typename... TLists>
+struct LocateIndexImpl {
  public:
-  struct DestinationPos {
+  struct IndexLocation {
     std::size_t list_pos{};
     std::size_t elem_pos{};
   };
 
  private:
-  static constexpr DestinationPos Get() {
-    static constexpr std::array kListSizes = {GetSize<TLists>::value...};
+  static constexpr IndexLocation Get() {
+    static constexpr std::array kListSizes = {Size<TLists>::value...};
     std::size_t current_list = 0;
     std::size_t current_pos = I;
 
@@ -117,24 +138,22 @@ struct GetDestinationPosImpl {
   }
 
  public:
-  static constexpr const DestinationPos value = Get();
+  static constexpr const IndexLocation value = Get();
 };
 }  // namespace details
 
-template <std::size_t I, concepts::VariadicInstance... TLists>
-using GetDestinationPos =
-    details::GetDestinationPosImpl<I, std::remove_cvref_t<TLists>...>;
+template <std::size_t I, concepts::VariadicTemplate... TLists>
+using LocateIndex = details::LocateIndexImpl<I, std::remove_cvref_t<TLists>...>;
 
-template <std::size_t I, concepts::VariadicInstance... TLists>
-inline constexpr auto GetDestinationPosV =
-    GetDestinationPos<I, TLists...>::value;
+template <std::size_t I, concepts::VariadicTemplate... TLists>
+inline constexpr auto LocateIndexV = LocateIndex<I, TLists...>::value;
 
 namespace details {
-template <concepts::VariadicInstance... TLists>
+template <typename... TLists>
 struct CatListsImpl;
 
 template <template <typename...> typename Shell, typename... CurrTypes,
-          typename... NextTypes, concepts::VariadicInstance... NextTLists>
+          typename... NextTypes, typename... NextTLists>
 struct CatListsImpl<Shell<CurrTypes...>, Shell<NextTypes...>, NextTLists...> {
   using type =
       CatListsImpl<Shell<CurrTypes..., NextTypes...>, NextTLists...>::type;
@@ -146,10 +165,45 @@ struct CatListsImpl<Shell<CurrTypes...>> {
 };
 }  // namespace details
 
-template <concepts::VariadicInstance... TLists>
+template <concepts::VariadicTemplate... TLists>
 using CatLists = details::CatListsImpl<std::remove_cvref_t<TLists>...>;
 
-template <concepts::VariadicInstance... TLists>
+template <concepts::VariadicTemplate... TLists>
 using CatListsT = CatLists<TLists...>::type;
+
+namespace details {
+template <typename TList, template <typename...> typename Shell>
+struct RebindImpl;
+
+template <template <typename...> typename OldShell,
+          template <typename...> typename Shell, typename... Types>
+struct RebindImpl<OldShell<Types...>, Shell> {
+  using type = Shell<Types...>;
+};
+}  // namespace details
+
+template <concepts::VariadicTemplate TList,
+          template <typename...> typename Shell>
+using Rebind = details::RebindImpl<std::remove_cvref_t<TList>, Shell>;
+
+template <typename TList, template <typename...> typename Shell>
+using RebindT = Rebind<TList, Shell>::type;
+
+namespace details {
+template <typename TList>
+struct UnbindImpl;
+
+template <template <typename...> typename Shell, typename... Types>
+struct UnbindImpl<Shell<Types...>> {
+  template <typename... NewTypes>
+  using type = Shell<NewTypes...>;
+};
+};  // namespace details
+
+template <concepts::VariadicTemplate TList>
+using Unbind = details::UnbindImpl<TList>;
+
+template <concepts::VariadicTemplate TList, typename... NewTypes>
+using UnbindT = typename Unbind<TList>::template type<NewTypes...>;
 
 };  // namespace kxi::meta

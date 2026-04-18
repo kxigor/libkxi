@@ -1,7 +1,6 @@
 #pragma once
 
-#include "tuple/concepts.hpp"
-#include "tuple/core.hpp"
-#include "tuple/fwd.hpp"
-#include "tuple/helpers.hpp"
-#include "tuple/ops.hpp"
+#include "tuple/compact.hpp"
+#include "tuple/flat.hpp"
+#include "tuple/like.hpp"
+#include "tuple/sorted.hpp"

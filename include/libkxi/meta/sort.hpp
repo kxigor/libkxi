@@ -10,7 +10,7 @@
 namespace kxi::meta {
 
 template <template <typename LHS, typename RHS> typename PredicatT,
-          concepts::VariadicInstance TList>
+          concepts::VariadicTemplate TList>
 struct Sort;
 
 template <template <typename...> typename Shell,
@@ -19,7 +19,7 @@ template <template <typename...> typename Shell,
 struct Sort<PredicatT, Shell<Args...>> {
  public:
   using TList = Shell<Args...>;
-  static constexpr const std::size_t kSize = GetSizeV<TList>;
+  static constexpr const std::size_t kSize = SizeV<TList>;
   using RowT = std::array<bool, kSize>;
   using MatrixT = std::array<RowT, kSize>;
   using IndexMapT = std::array<std::size_t, kSize>;
@@ -28,8 +28,8 @@ struct Sort<PredicatT, Shell<Args...>> {
   [[nodiscard]] static constexpr auto MakeRelationMatrix() noexcept {
     return []<std::size_t... Is>(std::index_sequence<Is...>) {
       return MatrixT{([]<std::size_t Idx>() {
-        return RowT{PredicatT<meta::GetTypeT<Idx, TList>,
-                              meta::GetTypeT<Is, TList>>::value...};
+        return RowT{PredicatT<meta::TypeAtT<Idx, TList>,
+                              meta::TypeAtT<Is, TList>>::value...};
       }.template operator()<Is>())...};
     }(std::make_index_sequence<kSize>{});
   }
@@ -72,7 +72,7 @@ struct Sort<PredicatT, Shell<Args...>> {
 
   using SortedShellT =
       decltype([]<std::size_t... Is>(std::index_sequence<Is...>) {
-        return Shell<meta::GetTypeT<kPermutation[Is], TList>...>{};
+        return Shell<meta::TypeAtT<kPermutation[Is], TList>...>{};
       }(std::make_index_sequence<kSize>{}));
 };
 

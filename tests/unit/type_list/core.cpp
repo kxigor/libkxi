@@ -6,86 +6,86 @@
 namespace {
 
 using kxi::meta::CatListsT;
-using kxi::meta::GetCount;
-using kxi::meta::GetDestinationPosV;
-using kxi::meta::GetIndexV;
-using kxi::meta::GetSizeV;
-using kxi::meta::GetTypeT;
+using kxi::meta::Count;
+using kxi::meta::LocateIndexV;
+using kxi::meta::IndexOfV;
+using kxi::meta::SizeV;
+using kxi::meta::TypeAtT;
 
 template <typename...>
 struct TList {};
 
-// --- GetSize ---
+// --- Size ---
 
-TEST(HeterogeneousGetSize, EmptyList) { EXPECT_EQ((GetSizeV<TList<>>), 0u); }
+TEST(HeterogeneousGetSize, EmptyList) { EXPECT_EQ((SizeV<TList<>>), 0u); }
 
 TEST(HeterogeneousGetSize, SingleElement) {
-  EXPECT_EQ((GetSizeV<TList<int>>), 1u);
+  EXPECT_EQ((SizeV<TList<int>>), 1u);
 }
 
 TEST(HeterogeneousGetSize, MultipleElements) {
-  EXPECT_EQ((GetSizeV<TList<int, double, char>>), 3u);
+  EXPECT_EQ((SizeV<TList<int, double, char>>), 3u);
 }
 
-// --- GetType ---
+// --- TypeAt ---
 
 TEST(HeterogeneousGetType, FirstElement) {
-  EXPECT_TRUE((std::is_same_v<GetTypeT<0, TList<int, double, char>>, int>));
+  EXPECT_TRUE((std::is_same_v<TypeAtT<0, TList<int, double, char>>, int>));
 }
 
 TEST(HeterogeneousGetType, MiddleElement) {
-  EXPECT_TRUE((std::is_same_v<GetTypeT<1, TList<int, double, char>>, double>));
+  EXPECT_TRUE((std::is_same_v<TypeAtT<1, TList<int, double, char>>, double>));
 }
 
 TEST(HeterogeneousGetType, LastElement) {
-  EXPECT_TRUE((std::is_same_v<GetTypeT<2, TList<int, double, char>>, char>));
+  EXPECT_TRUE((std::is_same_v<TypeAtT<2, TList<int, double, char>>, char>));
 }
 
 TEST(HeterogeneousGetType, SingleElementList) {
-  EXPECT_TRUE((std::is_same_v<GetTypeT<0, TList<float>>, float>));
+  EXPECT_TRUE((std::is_same_v<TypeAtT<0, TList<float>>, float>));
 }
 
-// --- GetCount ---
+// --- Count ---
 
 TEST(HeterogeneousGetCount, TypeNotPresent) {
-  EXPECT_EQ((GetCount<float, TList<int, double, char>>::value), 0u);
+  EXPECT_EQ((Count<float, TList<int, double, char>>::value), 0u);
 }
 
 TEST(HeterogeneousGetCount, TypePresentOnce) {
-  EXPECT_EQ((GetCount<int, TList<int, double, char>>::value), 1u);
+  EXPECT_EQ((Count<int, TList<int, double, char>>::value), 1u);
 }
 
 TEST(HeterogeneousGetCount, TypePresentMultipleTimes) {
-  EXPECT_EQ((GetCount<int, TList<int, double, int, char, int>>::value), 3u);
+  EXPECT_EQ((Count<int, TList<int, double, int, char, int>>::value), 3u);
 }
 
 TEST(HeterogeneousGetCount, EmptyList) {
-  EXPECT_EQ((GetCount<int, TList<>>::value), 0u);
+  EXPECT_EQ((Count<int, TList<>>::value), 0u);
 }
 
-// --- GetIndex ---
+// --- IndexOf ---
 
 TEST(HeterogeneousGetIndex, FirstElement) {
-  EXPECT_EQ((GetIndexV<int, TList<int, double, char>>), 0u);
+  EXPECT_EQ((IndexOfV<int, TList<int, double, char>>), 0u);
 }
 
 TEST(HeterogeneousGetIndex, MiddleElement) {
-  EXPECT_EQ((GetIndexV<double, TList<int, double, char>>), 1u);
+  EXPECT_EQ((IndexOfV<double, TList<int, double, char>>), 1u);
 }
 
 TEST(HeterogeneousGetIndex, LastElement) {
-  EXPECT_EQ((GetIndexV<char, TList<int, double, char>>), 2u);
+  EXPECT_EQ((IndexOfV<char, TList<int, double, char>>), 2u);
 }
 
-// --- GetDestinationPos ---
+// --- LocateIndex ---
 
 TEST(HeterogeneousDestinationPos, SingleList) {
   using L1 = TList<int, double, char>;
-  constexpr auto pos0 = GetDestinationPosV<0, L1>;
+  constexpr auto pos0 = LocateIndexV<0, L1>;
   EXPECT_EQ(pos0.list_pos, 0u);
   EXPECT_EQ(pos0.elem_pos, 0u);
 
-  constexpr auto pos2 = GetDestinationPosV<2, L1>;
+  constexpr auto pos2 = LocateIndexV<2, L1>;
   EXPECT_EQ(pos2.list_pos, 0u);
   EXPECT_EQ(pos2.elem_pos, 2u);
 }
@@ -95,23 +95,23 @@ TEST(HeterogeneousDestinationPos, MultipleLists) {
   using L2 = TList<char>;
   using L3 = TList<float, long>;
 
-  constexpr auto pos0 = GetDestinationPosV<0, L1, L2, L3>;
+  constexpr auto pos0 = LocateIndexV<0, L1, L2, L3>;
   EXPECT_EQ(pos0.list_pos, 0u);
   EXPECT_EQ(pos0.elem_pos, 0u);
 
-  constexpr auto pos1 = GetDestinationPosV<1, L1, L2, L3>;
+  constexpr auto pos1 = LocateIndexV<1, L1, L2, L3>;
   EXPECT_EQ(pos1.list_pos, 0u);
   EXPECT_EQ(pos1.elem_pos, 1u);
 
-  constexpr auto pos2 = GetDestinationPosV<2, L1, L2, L3>;
+  constexpr auto pos2 = LocateIndexV<2, L1, L2, L3>;
   EXPECT_EQ(pos2.list_pos, 1u);
   EXPECT_EQ(pos2.elem_pos, 0u);
 
-  constexpr auto pos3 = GetDestinationPosV<3, L1, L2, L3>;
+  constexpr auto pos3 = LocateIndexV<3, L1, L2, L3>;
   EXPECT_EQ(pos3.list_pos, 2u);
   EXPECT_EQ(pos3.elem_pos, 0u);
 
-  constexpr auto pos4 = GetDestinationPosV<4, L1, L2, L3>;
+  constexpr auto pos4 = LocateIndexV<4, L1, L2, L3>;
   EXPECT_EQ(pos4.list_pos, 2u);
   EXPECT_EQ(pos4.elem_pos, 1u);
 }

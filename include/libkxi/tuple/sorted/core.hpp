@@ -1,8 +1,9 @@
 #pragma once
 
 #include <libkxi/meta.hpp>
-#include <libkxi/sorted_tuple/fwd.hpp>
-#include <libkxi/tuple.hpp>
+#include <libkxi/tuple/flat.hpp>
+
+#include "fwd.hpp"
 
 namespace kxi::tuple {
 
@@ -11,7 +12,7 @@ template <template <typename LHS, typename RHS> typename Predicat,
 class SortedTuple {
  private:
   /*========================== Usings ==========================*/
-  using SorterT = meta::Sort<Predicat, FlatTuple<Types...>>;
+  using SorterT = meta::Sort<Predicat, flat::FlatTuple<Types...>>;
   using BaseTupleT = typename SorterT::SortedShellT;
 
  public:
@@ -31,12 +32,12 @@ class SortedTuple {
             [&]<std::size_t... Is>(std::index_sequence<Is...> /*unused*/) {
               using ArgsTypeListT = meta::Types<Args...>;
               using SavedArgsTupleT =
-                  tuple::FlatTuple<std::remove_reference_t<Args>&...>;
+                  flat::FlatTuple<std::remove_reference_t<Args>&...>;
 
               SavedArgsTupleT tuple_args{args...};
 
               return BaseTupleT{std::forward<
-                  meta::GetTypeT<SorterT::kPermutation[Is], ArgsTypeListT>>(
+                  meta::TypeAtT<SorterT::kPermutation[Is], ArgsTypeListT>>(
                   tuple_args.template Get<SorterT::kPermutation[Is]>())...};
             }(std::make_index_sequence<sizeof...(Args)>{})) {}
 

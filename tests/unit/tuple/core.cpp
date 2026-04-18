@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
 
-#include <libkxi/tuple.hpp>
+#include <libkxi/tuple/flat.hpp>
 #include <string>
 #include <type_traits>
 
 namespace {
 
-using kxi::tuple::FlatTuple;
-using kxi::tuple::TupleElementT;
-using kxi::tuple::TupleSizeV;
+using kxi::tuple::flat::FlatTuple;
+using kxi::tuple::flat::TupleElementT;
+using kxi::tuple::flat::TupleSizeV;
 
 // --- TupleSize ---
 
