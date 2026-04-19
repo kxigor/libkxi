@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libkxi/tuple/sorted.hpp>  // IWYU pragma: keep
+#include <libkxi/tuple/sorted.hpp>
 
 namespace kxi::tuple::compact {
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libkxi/tuple/like.hpp>  // IWYU pragma: keep
+#include <libkxi/tuple/like.hpp>
 
 #include "core.hpp"
 

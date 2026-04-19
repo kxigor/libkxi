@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libkxi/meta.hpp>  // IWYU pragma: keep
+#include <libkxi/meta.hpp>
 #include <utility>
 
 #include "core_details.hpp"
