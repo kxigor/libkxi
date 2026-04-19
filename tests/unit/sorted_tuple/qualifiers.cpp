@@ -8,7 +8,7 @@
 
 namespace {
 
-using kxi::tuple::SortedTuple;
+using kxi::tuple::sorted::SortedTuple;
 
 template <typename LHS, typename RHS>
 struct SizeofLess {

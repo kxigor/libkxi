@@ -2,10 +2,11 @@
 
 #include <array>
 #include <cstddef>
-#include <libkxi/meta/concepts.hpp>
-#include <libkxi/meta/core.hpp>
-#include <libkxi/utility.hpp>
 #include <numeric>
+#include <utility>
+
+#include "concepts.hpp"
+#include "core.hpp"
 
 namespace kxi::meta {
 

@@ -2,5 +2,5 @@
 
 namespace kxi::tuple::flat {
 template <typename... Args>
-class FlatTuple;
+class Tuple;
 }  // namespace kxi::tuple::flat

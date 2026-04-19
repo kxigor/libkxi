@@ -2,7 +2,6 @@
 
 #include <cstddef>
 #include <libkxi/meta.hpp>  // IWYU pragma: keep
-#include <libkxi/types.hpp>
 #include <libkxi/utility.hpp>
 #include <type_traits>
 #include <utility>
@@ -10,37 +9,37 @@
 namespace kxi::tuple::flat::details {
 
 template <utility::concepts::IndexSequence IndexesCortage,
-          meta::concepts::Types TypesCortage>
-
-struct FlatTupleImpl;
+          meta::pack::concepts::PackHolder TypesCortage>
+struct TupleImpl;
 
 template <std::size_t... Indexes, typename... Types>
-class FlatTupleImpl<std::index_sequence<Indexes...>, meta::Types<Types...>>
+class TupleImpl<std::index_sequence<Indexes...>,
+                meta::pack::PackHolder<Types...>>
     : utility::IndexedType<Indexes, Types>... {
   /*====================== Usings/Helpers ======================*/
  private:
   using IndexesCortage = std::index_sequence<Indexes...>;
-  using TypesCortage = meta::Types<Types...>;
+  using TypesCortage = meta::pack::PackHolder<Types...>;
 
   /*================= Constructors/Destructors =================*/
  public:
-  constexpr FlatTupleImpl() = default;
+  constexpr TupleImpl() = default;
 
-  constexpr FlatTupleImpl(const FlatTupleImpl& /*unused*/) = default;
+  constexpr TupleImpl(const TupleImpl& /*unused*/) = default;
 
-  constexpr FlatTupleImpl(FlatTupleImpl&& /*unused*/) = default;
+  constexpr TupleImpl(TupleImpl&& /*unused*/) = default;
 
   template <typename... Args>
-  requires utility::concepts::PerfectCtorGuard<FlatTupleImpl, Args...>
-  constexpr FlatTupleImpl(Args&&... args)
+  requires utility::concepts::PerfectCtorGuard<TupleImpl, Args...>
+  constexpr TupleImpl(Args&&... args)
       : utility::IndexedType<Indexes, Types>(std::forward<Args>(args))... {}
 
-  constexpr ~FlatTupleImpl() = default;
+  constexpr ~TupleImpl() = default;
 
   /*======================= Assignments ========================*/
-  constexpr FlatTupleImpl& operator=(const FlatTupleImpl& /*unused*/) = default;
+  constexpr TupleImpl& operator=(const TupleImpl& /*unused*/) = default;
 
-  constexpr FlatTupleImpl& operator=(FlatTupleImpl&& /*unused*/) = default;
+  constexpr TupleImpl& operator=(TupleImpl&& /*unused*/) = default;
 
   /*======================== Interface =========================*/
   template <std::size_t I, typename Self>
@@ -55,7 +54,7 @@ class FlatTupleImpl<std::index_sequence<Indexes...>, meta::Types<Types...>>
         .template Get<meta::IndexOfV<T, TypesCortage>>();
   }
 
-  constexpr void Swap(FlatTupleImpl& other) noexcept(
+  constexpr void Swap(TupleImpl& other) noexcept(
       (std::is_nothrow_swappable_v<Types> && ...)) {
     (std::swap(Get<Indexes>(), other.Get<Indexes>()), ...);
   }

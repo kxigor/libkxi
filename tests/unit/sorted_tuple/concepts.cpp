@@ -5,8 +5,8 @@
 
 namespace {
 
-using kxi::tuple::IsSortedTupleSpecV;
-using kxi::tuple::SortedTuple;
+using kxi::tuple::sorted::IsSortedTupleSpecV;
+using kxi::tuple::sorted::SortedTuple;
 
 template <typename LHS, typename RHS>
 struct SizeofLess {
@@ -34,7 +34,7 @@ TEST(SortedTupleConcepts, NonSortedTupleSpecIsRejected) {
   EXPECT_FALSE(IsSortedTupleSpecV<int>);
   EXPECT_FALSE(IsSortedTupleSpecV<double>);
   EXPECT_FALSE((IsSortedTupleSpecV<std::pair<int, double>>));
-  EXPECT_FALSE((IsSortedTupleSpecV<kxi::tuple::flat::FlatTuple<int, double>>));
+  EXPECT_FALSE((IsSortedTupleSpecV<kxi::tuple::flat::Tuple<int, double>>));
 }
 
 }  // namespace

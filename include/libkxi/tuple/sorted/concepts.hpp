@@ -4,7 +4,7 @@
 
 #include "fwd.hpp"
 
-namespace kxi::tuple {
+namespace kxi::tuple::sorted {
 
 namespace details {
 template <typename T>
@@ -31,4 +31,4 @@ template <typename T>
 concept SortedTuple = IsSortedTupleSpecV<T>;
 }  // namespace concepts
 
-};  // namespace kxi::tuple
+};  // namespace kxi::tuple::sorted

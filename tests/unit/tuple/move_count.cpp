@@ -7,7 +7,7 @@
 namespace {
 
 using kxi::tuple::flat::Make;
-using kxi::tuple::flat::FlatTuple;
+using kxi::tuple::flat::Tuple;
 using kxi::tuple::flat::Cat;
 
 struct Counters {
@@ -59,7 +59,7 @@ TEST_F(TupleMoveCountingTest, ConstructFromLvalue) {
   Tracked t(42);
   g_counters.Reset();
 
-  FlatTuple<Tracked> tup(t);
+  Tuple<Tracked> tup(t);
 
   EXPECT_EQ(g_counters.copy_ctor, 1u);
   EXPECT_EQ(g_counters.move_ctor, 0u);
@@ -72,7 +72,7 @@ TEST_F(TupleMoveCountingTest, ConstructFromRvalue) {
   Tracked t(42);
   g_counters.Reset();
 
-  FlatTuple<Tracked> tup(std::move(t));
+  Tuple<Tracked> tup(std::move(t));
 
   EXPECT_EQ(g_counters.copy_ctor, 0u);
   EXPECT_EQ(g_counters.move_ctor, 1u);
@@ -82,10 +82,10 @@ TEST_F(TupleMoveCountingTest, ConstructFromRvalue) {
 // --- Copy construction of Tuple ---
 
 TEST_F(TupleMoveCountingTest, TupleCopyConstruct) {
-  FlatTuple<Tracked> t1(Tracked(10));
+  Tuple<Tracked> t1(Tracked(10));
   g_counters.Reset();
 
-  FlatTuple<Tracked> t2(t1);
+  Tuple<Tracked> t2(t1);
 
   EXPECT_EQ(g_counters.copy_ctor, 1u);
   EXPECT_EQ(g_counters.move_ctor, 0u);
@@ -95,10 +95,10 @@ TEST_F(TupleMoveCountingTest, TupleCopyConstruct) {
 // --- Move construction of Tuple ---
 
 TEST_F(TupleMoveCountingTest, TupleMoveConstruct) {
-  FlatTuple<Tracked> t1(Tracked(10));
+  Tuple<Tracked> t1(Tracked(10));
   g_counters.Reset();
 
-  FlatTuple<Tracked> t2(std::move(t1));
+  Tuple<Tracked> t2(std::move(t1));
 
   EXPECT_EQ(g_counters.copy_ctor, 0u);
   EXPECT_EQ(g_counters.move_ctor, 1u);
@@ -108,8 +108,8 @@ TEST_F(TupleMoveCountingTest, TupleMoveConstruct) {
 // --- Copy assignment ---
 
 TEST_F(TupleMoveCountingTest, TupleCopyAssign) {
-  FlatTuple<Tracked> t1(Tracked(10));
-  FlatTuple<Tracked> t2(Tracked(20));
+  Tuple<Tracked> t1(Tracked(10));
+  Tuple<Tracked> t2(Tracked(20));
   g_counters.Reset();
 
   t2 = t1;
@@ -122,8 +122,8 @@ TEST_F(TupleMoveCountingTest, TupleCopyAssign) {
 // --- Move assignment ---
 
 TEST_F(TupleMoveCountingTest, TupleMoveAssign) {
-  FlatTuple<Tracked> t1(Tracked(10));
-  FlatTuple<Tracked> t2(Tracked(20));
+  Tuple<Tracked> t1(Tracked(10));
+  Tuple<Tracked> t2(Tracked(20));
   g_counters.Reset();
 
   t2 = std::move(t1);
@@ -164,7 +164,7 @@ TEST_F(TupleMoveCountingTest, MakeTupleFromLvalue) {
 // --- Get rvalue from tuple triggers no copy/move (returns reference) ---
 
 TEST_F(TupleMoveCountingTest, GetLvalueNoCopyMove) {
-  FlatTuple<Tracked> tup(Tracked(42));
+  Tuple<Tracked> tup(Tracked(42));
   g_counters.Reset();
 
   decltype(auto) ref = tup.template Get<0>();
@@ -179,8 +179,8 @@ TEST_F(TupleMoveCountingTest, GetLvalueNoCopyMove) {
 // ---
 
 TEST_F(TupleMoveCountingTest, SwapCounting) {
-  FlatTuple<Tracked> t1(Tracked(1));
-  FlatTuple<Tracked> t2(Tracked(2));
+  Tuple<Tracked> t1(Tracked(1));
+  Tuple<Tracked> t2(Tracked(2));
   g_counters.Reset();
 
   t1.Swap(t2);
@@ -203,7 +203,7 @@ TEST_F(TupleMoveCountingTest, TwoElementsMoveConstruct) {
   Tracked b(2);
   g_counters.Reset();
 
-  FlatTuple<Tracked, Tracked> tup(std::move(a), std::move(b));
+  Tuple<Tracked, Tracked> tup(std::move(a), std::move(b));
 
   EXPECT_EQ(g_counters.copy_ctor, 0u);
   EXPECT_EQ(g_counters.move_ctor, 2u);
@@ -212,8 +212,8 @@ TEST_F(TupleMoveCountingTest, TwoElementsMoveConstruct) {
 }
 
 TEST_F(TupleMoveCountingTest, TwoElementsSwap) {
-  FlatTuple<Tracked, Tracked> t1(Tracked(1), Tracked(2));
-  FlatTuple<Tracked, Tracked> t2(Tracked(3), Tracked(4));
+  Tuple<Tracked, Tracked> t1(Tracked(1), Tracked(2));
+  Tuple<Tracked, Tracked> t2(Tracked(3), Tracked(4));
   g_counters.Reset();
 
   t1.Swap(t2);

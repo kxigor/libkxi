@@ -2,9 +2,10 @@
 
 #include <array>
 #include <cstddef>
-#include <libkxi/meta/concepts.hpp>
 #include <libkxi/traits.hpp>
 #include <type_traits>
+
+#include "concepts.hpp"
 
 namespace kxi::meta {
 
@@ -197,19 +198,19 @@ struct TemplateHolder {
 
 namespace details {
 template <typename TList>
-struct UnbindImpl;
+struct ShellOfImpl;
 
 template <template <typename...> typename Shell, typename... Types>
-struct UnbindImpl<Shell<Types...>> {
+struct ShellOfImpl<Shell<Types...>> {
   using type = TemplateHolder<Shell>;
 };
 };  // namespace details
 
 template <concepts::VariadicTemplate TList>
-using Unbind = details::UnbindImpl<TList>;
+using ShellOf = details::ShellOfImpl<std::remove_cvref_t<TList>>;
 
 template <concepts::VariadicTemplate TList>
-using UnbindT = Unbind<TList>::type;
+using ShellOfT = ShellOf<TList>::type;
 
 template <typename... Types>
 struct IsAllSameTypes : std::true_type {};
@@ -240,7 +241,8 @@ inline constexpr auto IsAllSameTemplatesV =
 
 template <concepts::VariadicTemplate FirstTList,
           concepts::VariadicTemplate SecondTList>
-struct IsSameShell : std::is_same<UnbindT<FirstTList>, UnbindT<SecondTList>> {};
+struct IsSameShell : std::is_same<ShellOfT<FirstTList>, ShellOfT<SecondTList>> {
+};
 
 template <concepts::VariadicTemplate FirstTList,
           concepts::VariadicTemplate SecondTList>
@@ -248,7 +250,7 @@ inline constexpr auto IsSameShellV =
     IsSameShell<FirstTList, SecondTList>::value;
 
 template <concepts::VariadicTemplate... TLists>
-struct IsAllSameShells : IsAllSameTypes<UnbindT<TLists>...> {};
+struct IsAllSameShells : IsAllSameTypes<ShellOfT<TLists>...> {};
 
 template <concepts::VariadicTemplate... TLists>
 inline constexpr auto IsAllSameShellsV = IsAllSameShells<TLists...>::value;
@@ -260,22 +262,22 @@ concept AllSameShells = IsAllSameShellsV<Types...>;
 
 namespace details {
 template <typename... TList>
-struct UnbindSamePackImpl;
+struct CommonShellOfImpl;
 
 template <template <typename...> typename Shell, typename... Types,
           typename... OtherTLists>
-struct UnbindSamePackImpl<Shell<Types...>, OtherTLists...> {
+struct CommonShellOfImpl<Shell<Types...>, OtherTLists...> {
   using type = TemplateHolder<Shell>;
 };
 }  // namespace details
 
 template <concepts::VariadicTemplate... TLists>
 requires concepts::AllSameShells<TLists...>
-using UnbindSamePack =
-    details::UnbindSamePackImpl<std::remove_cvref_t<TLists>...>;
+using CommonShellOf =
+    details::CommonShellOfImpl<std::remove_cvref_t<TLists>...>;
 
 template <concepts::VariadicTemplate... TLists>
 requires concepts::AllSameShells<TLists...>
-using UnbindSamePackT = UnbindSamePack<TLists...>::type;
+using CommonShellOfT = CommonShellOf<TLists...>::type;
 
 };  // namespace kxi::meta

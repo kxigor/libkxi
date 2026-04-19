@@ -1,18 +1,22 @@
 #pragma once
 
-#include <libkxi/meta.hpp>
-#include <libkxi/tuple/flat.hpp>
+#include <cstddef>
+#include <libkxi/meta.hpp>        // IWYU pragma: keep
+#include <libkxi/tuple/flat.hpp>  // IWYU pragma: keep
+#include <libkxi/utility.hpp>     // IWYU pragma: keep
+#include <type_traits>
+#include <utility>
 
 #include "fwd.hpp"
 
-namespace kxi::tuple {
+namespace kxi::tuple::sorted {
 
 template <template <typename LHS, typename RHS> typename Predicat,
           typename... Types>
 class SortedTuple {
  private:
   /*========================== Usings ==========================*/
-  using SorterT = meta::Sort<Predicat, flat::FlatTuple<Types...>>;
+  using SorterT = meta::Sort<Predicat, flat::Tuple<Types...>>;
   using BaseTupleT = typename SorterT::SortedShellT;
 
  public:
@@ -30,9 +34,9 @@ class SortedTuple {
       : tuple_(
             /*copy elision works here*/
             [&]<std::size_t... Is>(std::index_sequence<Is...> /*unused*/) {
-              using ArgsTypeListT = meta::Types<Args...>;
+              using ArgsTypeListT = meta::pack::PackHolder<Args...>;
               using SavedArgsTupleT =
-                  flat::FlatTuple<std::remove_reference_t<Args>&...>;
+                  flat::Tuple<std::remove_reference_t<Args>&...>;
 
               SavedArgsTupleT tuple_args{args...};
 
@@ -70,4 +74,4 @@ class SortedTuple {
   BaseTupleT tuple_;
 };
 
-};  // namespace kxi::tuple
+};  // namespace kxi::tuple::sorted

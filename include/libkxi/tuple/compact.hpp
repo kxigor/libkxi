@@ -1,4 +1,4 @@
 #pragma once
 
-#include "compact/concepts.hpp"
-#include "compact/core.hpp"
+#include "compact/concepts.hpp"  // IWYU pragma: export
+#include "compact/core.hpp"      // IWYU pragma: export

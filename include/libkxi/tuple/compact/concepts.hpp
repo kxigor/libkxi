@@ -1,11 +1,10 @@
 #pragma once
 
 #include <libkxi/meta.hpp>
-#include <libkxi/utility.hpp>
 
 #include "core.hpp"
 
-namespace kxi::tuple {
+namespace kxi::tuple::compact {
 
 template <typename T>
 struct IsCompactTuple : meta::IsHeterogeneous<CompactTuple, T> {};
@@ -18,4 +17,4 @@ template <typename T>
 concept CompactTuple = IsCompactTupleV<T>;
 }  // namespace concepts
 
-};  // namespace kxi::tuple
+};  // namespace kxi::tuple::compact

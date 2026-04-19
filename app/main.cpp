@@ -5,8 +5,8 @@
 #include <tuple>
 
 int main() {
-  kxi::tuple::flat::FlatTuple<int, float, int> t(1, 2.f, 3);
-  kxi::tuple::flat::FlatTuple<int, float, int> t2(1, 2.f, 3);
+  kxi::tuple::flat::Tuple<int, float, int> t(1, 2.f, 3);
+  kxi::tuple::flat::Tuple<int, float, int> t2(1, 2.f, 3);
   auto t3 = kxi::tuple::flat::Cat(t, t2);
   t.Get<1>() = 2.2f;
   std::cout << t.Get<1>() << '\n';
