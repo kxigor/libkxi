@@ -97,4 +97,43 @@ TEST(HeterogeneousSort, StabilityEqualSizes) {
   EXPECT_TRUE((std::is_same_v<Sorted, TList<int, float>>));
 }
 
+// --- Edge cases ---
+
+TEST(HeterogeneousSort, EmptyList) {
+  using Sorted = Sort<SizeofLess, TList<>>::SortedShellT;
+  EXPECT_TRUE((std::is_same_v<Sorted, TList<>>));
+  EXPECT_EQ((Sort<SizeofLess, TList<>>::kPermutation.size()), 0u);
+}
+
+TEST(HeterogeneousSort, SingleElement) {
+  using Sorted = Sort<SizeofLess, TList<int>>::SortedShellT;
+  EXPECT_TRUE((std::is_same_v<Sorted, TList<int>>));
+  using Info = Sort<SizeofLess, TList<int>>;
+  EXPECT_EQ(Info::kPermutation[0], 0u);
+  EXPECT_EQ(Info::kInversePermutation[0], 0u);
+}
+
+TEST(HeterogeneousSort, AllEqualKeepsOriginalOrder) {
+  // Stable sort: equal-sized types must preserve original order.
+  using Input = TList<int, float, std::int32_t>;  // all 4 bytes
+  using Sorted = Sort<SizeofLess, Input>::SortedShellT;
+  EXPECT_TRUE((std::is_same_v<Sorted, Input>));
+}
+
+TEST(HeterogeneousSort, InversePermutationIsInverse) {
+  using Input = TList<double, std::int32_t, std::int8_t, float, std::int16_t>;
+  using Info = Sort<SizeofLess, Input>;
+  for (std::size_t i = 0; i < Info::kPermutation.size(); ++i) {
+    EXPECT_EQ(Info::kInversePermutation[Info::kPermutation[i]], i);
+    EXPECT_EQ(Info::kPermutation[Info::kInversePermutation[i]], i);
+  }
+}
+
+TEST(HeterogeneousSort, PreservesShell) {
+  // Sort must keep the same shell template, only reorder type arguments.
+  using Sorted = Sort<SizeofLess, TList<double, char>>::SortedShellT;
+  using kxi::meta::IsSameShellV;
+  EXPECT_TRUE((IsSameShellV<Sorted, TList<int>>));
+}
+
 }  // namespace

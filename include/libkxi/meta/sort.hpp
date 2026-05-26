@@ -11,7 +11,7 @@
 namespace kxi::meta {
 
 template <template <typename LHS, typename RHS> typename PredicatT,
-          concepts::VariadicTemplate TList>
+          concepts::TList TList>
 struct Sort;
 
 template <template <typename...> typename Shell,

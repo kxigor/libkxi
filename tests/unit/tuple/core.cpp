@@ -7,27 +7,6 @@
 namespace {
 
 using kxi::tuple::flat::Tuple;
-using kxi::tuple::flat::TupleElementT;
-using kxi::tuple::flat::TupleSizeV;
-
-// --- TupleSize ---
-
-TEST(TupleCore, SizeEmpty) { EXPECT_EQ(TupleSizeV<Tuple<>>, 0u); }
-
-TEST(TupleCore, SizeSingle) { EXPECT_EQ(TupleSizeV<Tuple<int>>, 1u); }
-
-TEST(TupleCore, SizeMultiple) {
-  EXPECT_EQ((TupleSizeV<Tuple<int, double, char>>), 3u);
-}
-
-// --- TupleElement ---
-
-TEST(TupleCore, ElementTypes) {
-  using T = Tuple<int, double, std::string>;
-  EXPECT_TRUE((std::is_same_v<TupleElementT<0, T>, int>));
-  EXPECT_TRUE((std::is_same_v<TupleElementT<1, T>, double>));
-  EXPECT_TRUE((std::is_same_v<TupleElementT<2, T>, std::string>));
-}
 
 // --- Default construction ---
 

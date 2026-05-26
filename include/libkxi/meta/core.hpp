@@ -17,10 +17,10 @@ template <template <typename...> typename Shell, typename... Types>
 struct SizeImpl<Shell<Types...>> : traits::SizeConstant<sizeof...(Types)> {};
 }  // namespace details
 
-template <concepts::VariadicTemplate TList>
+template <concepts::TList TList>
 using Size = details::SizeImpl<std::remove_cvref_t<TList>>;
 
-template <concepts::VariadicTemplate TList>
+template <concepts::TList TList>
 inline constexpr std::size_t SizeV = Size<TList>::value;
 
 namespace details {
@@ -40,10 +40,10 @@ struct TypeAtImpl<0, Shell<Head, Tail...>> {
 };
 }  // namespace details
 
-template <std::size_t I, concepts::VariadicTemplate TList>
+template <std::size_t I, concepts::TList TList>
 using TypeAt = details::TypeAtImpl<I, std::remove_cvref_t<TList>>;
 
-template <std::size_t I, concepts::VariadicTemplate TList>
+template <std::size_t I, concepts::TList TList>
 using TypeAtT = typename TypeAt<I, TList>::type;
 
 namespace details {
@@ -64,10 +64,10 @@ template <template <typename...> typename Shell, typename Head>
 struct CountImpl<Head, Shell<>> : traits::SizeConstant<0> {};
 }  // namespace details
 
-template <typename T, concepts::VariadicTemplate TList>
+template <typename T, concepts::TList TList>
 using Count = details::CountImpl<T, std::remove_cvref_t<TList>>;
 
-template <typename T, concepts::VariadicTemplate TList>
+template <typename T, concepts::TList TList>
 inline constexpr std::size_t CountV = Count<T, TList>::value;
 
 namespace details {
@@ -81,10 +81,10 @@ struct IsDistinctImpl<Shell<Types...>> {
 };
 };  // namespace details
 
-template <concepts::VariadicTemplate TList>
+template <concepts::TList TList>
 using IsDistinct = details::IsDistinctImpl<std::remove_cvref_t<TList>>;
 
-template <concepts::VariadicTemplate TList>
+template <concepts::TList TList>
 inline constexpr auto IsDistinctV = IsDistinct<TList>::value;
 
 namespace concepts {
@@ -143,10 +143,10 @@ struct LocateIndexImpl {
 };
 }  // namespace details
 
-template <std::size_t I, concepts::VariadicTemplate... TLists>
+template <std::size_t I, concepts::TList... TLists>
 using LocateIndex = details::LocateIndexImpl<I, std::remove_cvref_t<TLists>...>;
 
-template <std::size_t I, concepts::VariadicTemplate... TLists>
+template <std::size_t I, concepts::TList... TLists>
 inline constexpr auto LocateIndexV = LocateIndex<I, TLists...>::value;
 
 namespace details {
@@ -166,10 +166,10 @@ struct CatListsImpl<Shell<CurrTypes...>> {
 };
 }  // namespace details
 
-template <concepts::VariadicTemplate... TLists>
+template <concepts::TList... TLists>
 using CatLists = details::CatListsImpl<std::remove_cvref_t<TLists>...>;
 
-template <concepts::VariadicTemplate... TLists>
+template <concepts::TList... TLists>
 using CatListsT = CatLists<TLists...>::type;
 
 namespace details {
@@ -183,8 +183,7 @@ struct RebindImpl<OldShell<Types...>, Shell> {
 };
 }  // namespace details
 
-template <concepts::VariadicTemplate TList,
-          template <typename...> typename Shell>
+template <concepts::TList TList, template <typename...> typename Shell>
 using Rebind = details::RebindImpl<std::remove_cvref_t<TList>, Shell>;
 
 template <typename TList, template <typename...> typename Shell>
@@ -206,10 +205,10 @@ struct ShellOfImpl<Shell<Types...>> {
 };
 };  // namespace details
 
-template <concepts::VariadicTemplate TList>
+template <concepts::TList TList>
 using ShellOf = details::ShellOfImpl<std::remove_cvref_t<TList>>;
 
-template <concepts::VariadicTemplate TList>
+template <concepts::TList TList>
 using ShellOfT = ShellOf<TList>::type;
 
 template <typename... Types>
@@ -239,20 +238,18 @@ template <template <typename...> typename... Templates>
 inline constexpr auto IsAllSameTemplatesV =
     IsAllSameTemplates<Templates...>::value;
 
-template <concepts::VariadicTemplate FirstTList,
-          concepts::VariadicTemplate SecondTList>
+template <concepts::TList FirstTList, concepts::TList SecondTList>
 struct IsSameShell : std::is_same<ShellOfT<FirstTList>, ShellOfT<SecondTList>> {
 };
 
-template <concepts::VariadicTemplate FirstTList,
-          concepts::VariadicTemplate SecondTList>
+template <concepts::TList FirstTList, concepts::TList SecondTList>
 inline constexpr auto IsSameShellV =
     IsSameShell<FirstTList, SecondTList>::value;
 
-template <concepts::VariadicTemplate... TLists>
+template <concepts::TList... TLists>
 struct IsAllSameShells : IsAllSameTypes<ShellOfT<TLists>...> {};
 
-template <concepts::VariadicTemplate... TLists>
+template <concepts::TList... TLists>
 inline constexpr auto IsAllSameShellsV = IsAllSameShells<TLists...>::value;
 
 namespace concepts {
@@ -271,12 +268,12 @@ struct CommonShellOfImpl<Shell<Types...>, OtherTLists...> {
 };
 }  // namespace details
 
-template <concepts::VariadicTemplate... TLists>
+template <concepts::TList... TLists>
 requires concepts::AllSameShells<TLists...>
 using CommonShellOf =
     details::CommonShellOfImpl<std::remove_cvref_t<TLists>...>;
 
-template <concepts::VariadicTemplate... TLists>
+template <concepts::TList... TLists>
 requires concepts::AllSameShells<TLists...>
 using CommonShellOfT = CommonShellOf<TLists...>::type;
 

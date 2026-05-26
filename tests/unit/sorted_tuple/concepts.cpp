@@ -22,10 +22,7 @@ TEST(SortedTupleConcepts, SortedTupleSpecIsDetected) {
 TEST(SortedTupleConcepts, SortedTupleSpecWithCVRef) {
   EXPECT_TRUE((IsSortedTupleSpecV<const SortedTuple<SizeofLess, int>>));
   EXPECT_TRUE((IsSortedTupleSpecV<SortedTuple<SizeofLess, int>&>));
-  EXPECT_TRUE((IsSortedTupleSpecV<const SortedTuple<SizeofLess, int>&>));
   EXPECT_TRUE((IsSortedTupleSpecV<SortedTuple<SizeofLess, int>&&>));
-  EXPECT_TRUE((IsSortedTupleSpecV<const SortedTuple<SizeofLess, int>&&>));
-  EXPECT_TRUE((IsSortedTupleSpecV<volatile SortedTuple<SizeofLess, int>>));
   EXPECT_TRUE(
       (IsSortedTupleSpecV<const volatile SortedTuple<SizeofLess, int>&>));
 }

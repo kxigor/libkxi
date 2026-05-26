@@ -17,8 +17,11 @@ message(STATUS "Searching for code formatting tool: clang-format...")
 # --- Clang-Format ---
 find_program(CLANG_FORMAT_EXE
   NAMES 
-    clang-format-21 
-    clang-format-20 
+    clang-format-24
+    clang-format-23
+    clang-format-22
+    clang-format-21
+    clang-format-20
     clang-format-19
   DOC "Path to the preferred version of clang-format for formatting."
 )

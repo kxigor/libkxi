@@ -6,15 +6,15 @@
 
 namespace kxi::tuple::compact {
 
-template <typename T>
-struct IsCompactTuple : meta::IsHeterogeneous<CompactTuple, T> {};
+// template <typename T>
+// struct IsCompactTuple : meta::IsTList<CompactTuple, T> {};
 
-template <typename T>
-constexpr const bool IsCompactTupleV = IsCompactTuple<T>::value;
+// template <typename T>
+// constexpr const bool IsCompactTupleV = IsCompactTuple<T>::value;
 
-namespace concepts {
-template <typename T>
-concept CompactTuple = IsCompactTupleV<T>;
-}  // namespace concepts
+// namespace concepts {
+// template <typename T>
+// concept CompactTuple = IsCompactTupleV<T>;
+// }  // namespace concepts
 
 };  // namespace kxi::tuple::compact

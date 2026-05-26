@@ -11,14 +11,12 @@
 namespace kxi::tuple::like {
 template <std::size_t I, concepts::TupleLike TupleT>
 constexpr decltype(auto) Get(TupleT&& tuple) {
-  return std::forward_like<TupleT>(
-      std::forward<TupleT>(tuple).template Get<I>());
+  return std::forward<TupleT>(tuple).template Get<I>();
 }
 
 template <typename T, concepts::DistinctTupleLike TupleT>
 constexpr decltype(auto) Get(TupleT&& tuple) {
-  return std::forward_like<TupleT>(
-      std::forward<TupleT>(tuple).template Get<T>());
+  return std::forward<TupleT>(tuple).template Get<T>();
 }
 
 template <concepts::SwappableTuple TupleT>

@@ -15,6 +15,9 @@ message(STATUS "Searching for static analysis tools: clang-tidy and Python3 ..."
 # --- Clang-Tidy ---
 find_program(CLANG_TIDY_EXE
   NAMES
+    clang-tidy-24
+    clang-tidy-23
+    clang-tidy-22
     clang-tidy-21
     clang-tidy-20
     clang-tidy-19

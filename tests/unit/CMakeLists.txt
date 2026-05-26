@@ -1,3 +1,5 @@
 add_subdirectory(type_list)
+add_subdirectory(utility)
 add_subdirectory(tuple)
 add_subdirectory(sorted_tuple)
+add_subdirectory(compact_tuple)

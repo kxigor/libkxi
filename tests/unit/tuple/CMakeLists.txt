@@ -1,34 +1,48 @@
-add_gtest(TupleConcepts_Concepts
-  SOURCES concepts.cpp
-  LIBRARIES 
-    project_coverage
-    libkxi
-)
-
-add_gtest(TupleConcepts_Core
+add_gtest(FlatTuple_Core
   SOURCES core.cpp
-  LIBRARIES 
+  LIBRARIES
     project_coverage
     libkxi
 )
 
-add_gtest(TupleConcepts_MoveCount
+add_gtest(FlatTuple_Concepts
+  SOURCES concepts.cpp
+  LIBRARIES
+    project_coverage
+    libkxi
+)
+
+add_gtest(FlatTuple_Constexpr
+  SOURCES constexpr.cpp
+  LIBRARIES
+    project_coverage
+    libkxi
+)
+
+add_gtest(FlatTuple_Layout
+  SOURCES layout.cpp
+  LIBRARIES
+    project_coverage
+    libkxi
+)
+
+add_gtest(FlatTuple_MoveCount
   SOURCES move_count.cpp
-  LIBRARIES 
+  LIBRARIES
     project_coverage
     libkxi
 )
 
-add_gtest(TupleConcepts_Ops
+add_gtest(FlatTuple_Ops
   SOURCES ops.cpp
-  LIBRARIES 
+  LIBRARIES
     project_coverage
     libkxi
 )
 
-add_gtest(TupleConcepts_Qualifiers
+add_gtest(FlatTuple_Qualifiers
   SOURCES qualifiers.cpp
-  LIBRARIES 
+  LIBRARIES
     project_coverage
     libkxi
 )
