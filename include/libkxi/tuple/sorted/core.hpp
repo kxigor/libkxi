@@ -11,26 +11,26 @@
 
 namespace kxi::tuple::sorted {
 
-template <template <typename LHS, typename RHS> typename Predicat,
-          typename... Types>
-class SortedTuple {
+template <template <typename LHS, typename RHS> typename Pred>
+template <typename... Types>
+class Of<Pred>::Tuple {
  private:
   /*========================== Usings ==========================*/
-  using SorterT = meta::Sort<Predicat, flat::Tuple<Types...>>;
-  using BaseTupleT = typename SorterT::SortedShellT;
+  using SorterT = meta::Sort<Pred, flat::Tuple<Types...>>;
+  using BaseTupleT = SorterT::SortedShellT;
 
  public:
   /*================= Constructors/Destructors =================*/
-  constexpr SortedTuple() = default;
+  constexpr Tuple() = default;
 
-  constexpr SortedTuple(const SortedTuple& /*unused*/) = default;
+  constexpr Tuple(const Tuple& /*unused*/) = default;
 
-  constexpr SortedTuple(SortedTuple&& /*unused*/) = default;
+  constexpr Tuple(Tuple&& /*unused*/) = default;
 
   template <typename... Args>
-  requires utility::concepts::PerfectCtorGuard<SortedTuple, Args...> &&
+  requires utility::concepts::PerfectCtorGuard<Tuple, Args...> &&
            (sizeof...(Args) == sizeof...(Types))
-  constexpr SortedTuple(Args&&... args)
+  constexpr Tuple(Args&&... args)
       : tuple_(
             /*copy elision works here*/
             [&]<std::size_t... Is>(std::index_sequence<Is...> /*unused*/) {
@@ -45,12 +45,12 @@ class SortedTuple {
                   tuple_args.template Get<SorterT::kPermutation[Is]>())...};
             }(std::make_index_sequence<sizeof...(Args)>{})) {}
 
-  constexpr ~SortedTuple() = default;
+  constexpr ~Tuple() = default;
 
   /*======================= Assignments ========================*/
-  constexpr SortedTuple& operator=(const SortedTuple& /*unused*/) = default;
+  constexpr Tuple& operator=(const Tuple& /*unused*/) = default;
 
-  constexpr SortedTuple& operator=(SortedTuple&& /*unused*/) = default;
+  constexpr Tuple& operator=(Tuple&& /*unused*/) = default;
 
   /*======================== Interface =========================*/
   template <std::size_t I, typename Self>
@@ -64,7 +64,7 @@ class SortedTuple {
     return std::forward_like<Self>(self.tuple_).template Get<T>();
   }
 
-  constexpr void Swap(SortedTuple& other) noexcept(
+  constexpr void Swap(Tuple& other) noexcept(
       noexcept(std::declval<BaseTupleT&>().Swap(std::declval<BaseTupleT&>()))) {
     tuple_.Swap(other.tuple_);
   }

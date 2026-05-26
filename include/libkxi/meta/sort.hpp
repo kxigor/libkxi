@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <concepts>
 #include <cstddef>
 #include <numeric>
 #include <utility>
@@ -50,7 +51,7 @@ struct Sort<PredicatT, Shell<Args...>> {
         if (not kRelations[result[kRhsIdx]][result[kLhsIdx]]) {
           break;
         }
-        std::swap(result[kLhsIdx], result[kRhsIdx]);
+        std::ranges::swap(result[kLhsIdx], result[kRhsIdx]);
       }
     }
     return result;
@@ -71,10 +72,14 @@ struct Sort<PredicatT, Shell<Args...>> {
  public:
   static constexpr const auto kInversePermutation = MakeInversePermutation();
 
+ private:
+  template <std::size_t... Is>
+  static auto MakeSortedShell(std::index_sequence<Is...>)
+      -> Shell<meta::TypeAtT<kPermutation[Is], TList>...>;
+
+ public:
   using SortedShellT =
-      decltype([]<std::size_t... Is>(std::index_sequence<Is...>) {
-        return Shell<meta::TypeAtT<kPermutation[Is], TList>...>{};
-      }(std::make_index_sequence<kSize>{}));
+      decltype(MakeSortedShell(std::make_index_sequence<kSize>{}));
 };
 
 }  // namespace kxi::meta

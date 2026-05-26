@@ -8,7 +8,7 @@
 
 namespace {
 
-using kxi::tuple::sorted::SortedTuple;
+using kxi::tuple::sorted::Of;
 
 template <typename LHS, typename RHS>
 struct SizeofLess {
@@ -23,7 +23,7 @@ struct SizeofGreater {
 // --- Default construction ---
 
 TEST(SortedTupleCore, DefaultConstruct) {
-  SortedTuple<SizeofLess, int, double> t;
+  Of<SizeofLess>::Tuple<int, double> t;
   EXPECT_EQ(t.template Get<0>(), 0);
   EXPECT_EQ(t.template Get<1>(), 0.0);
 }
@@ -36,7 +36,7 @@ TEST(SortedTupleCore, ValueConstructAndGetByOriginalIndex) {
   // Sorted internally: char, int, double
   // But Get<0> should return the double (first original arg),
   // Get<1> the char, Get<2> the int
-  SortedTuple<SizeofLess, double, char, int> t(3.14, 'x', 42);
+  Of<SizeofLess>::Tuple<double, char, int> t(3.14, 'x', 42);
   EXPECT_DOUBLE_EQ(t.template Get<0>(), 3.14);
   EXPECT_EQ(t.template Get<1>(), 'x');
   EXPECT_EQ(t.template Get<2>(), 42);
@@ -44,7 +44,7 @@ TEST(SortedTupleCore, ValueConstructAndGetByOriginalIndex) {
 
 TEST(SortedTupleCore, ValueConstructAlreadySorted) {
   // char(1), int(4), double(8) — already sorted ascending
-  SortedTuple<SizeofLess, char, int, double> t('a', 10, 2.5);
+  Of<SizeofLess>::Tuple<char, int, double> t('a', 10, 2.5);
   EXPECT_EQ(t.template Get<0>(), 'a');
   EXPECT_EQ(t.template Get<1>(), 10);
   EXPECT_DOUBLE_EQ(t.template Get<2>(), 2.5);
@@ -52,7 +52,7 @@ TEST(SortedTupleCore, ValueConstructAlreadySorted) {
 
 TEST(SortedTupleCore, ValueConstructReverseSorted) {
   // double(8), int(4), char(1) — reverse of ascending
-  SortedTuple<SizeofLess, double, int, char> t(1.5, 10, 'z');
+  Of<SizeofLess>::Tuple<double, int, char> t(1.5, 10, 'z');
   EXPECT_DOUBLE_EQ(t.template Get<0>(), 1.5);
   EXPECT_EQ(t.template Get<1>(), 10);
   EXPECT_EQ(t.template Get<2>(), 'z');
@@ -60,33 +60,32 @@ TEST(SortedTupleCore, ValueConstructReverseSorted) {
 
 TEST(SortedTupleCore, ValueConstructWithGreaterPredicate) {
   // Descending sort: double first, then int, then char
-  SortedTuple<SizeofGreater, char, int, double> t('a', 10, 2.5);
+  Of<SizeofGreater>::Tuple<char, int, double> t('a', 10, 2.5);
   EXPECT_EQ(t.template Get<0>(), 'a');
   EXPECT_EQ(t.template Get<1>(), 10);
   EXPECT_DOUBLE_EQ(t.template Get<2>(), 2.5);
 }
 
 TEST(SortedTupleCore, SingleElement) {
-  SortedTuple<SizeofLess, int> t(42);
+  Of<SizeofLess>::Tuple<int> t(42);
   EXPECT_EQ(t.template Get<0>(), 42);
 }
 
 TEST(SortedTupleCore, FiveElements) {
   // Original: double(8), int32(4), int8(1), float(4), int16(2)
-  SortedTuple<SizeofLess, double, std::int32_t, std::int8_t, float,
-              std::int16_t>
-      t(1.0, 2, std::int8_t{3}, 4.0f, std::int16_t{5});
+  Of<SizeofLess>::Tuple<double, std::int32_t, std::int8_t, float, std::int16_t>
+      t(1.0, 2, std::int8_t{3}, 4.0F, std::int16_t{5});
   EXPECT_DOUBLE_EQ(t.template Get<0>(), 1.0);
   EXPECT_EQ(t.template Get<1>(), 2);
   EXPECT_EQ(t.template Get<2>(), std::int8_t{3});
-  EXPECT_FLOAT_EQ(t.template Get<3>(), 4.0f);
+  EXPECT_FLOAT_EQ(t.template Get<3>(), 4.0F);
   EXPECT_EQ(t.template Get<4>(), std::int16_t{5});
 }
 
 // --- Get by type ---
 
 TEST(SortedTupleCore, GetByType) {
-  SortedTuple<SizeofLess, double, char, int> t(3.14, 'x', 42);
+  Of<SizeofLess>::Tuple<double, char, int> t(3.14, 'x', 42);
   EXPECT_DOUBLE_EQ(t.template Get<double>(), 3.14);
   EXPECT_EQ(t.template Get<char>(), 'x');
   EXPECT_EQ(t.template Get<int>(), 42);
@@ -95,8 +94,8 @@ TEST(SortedTupleCore, GetByType) {
 // --- Copy construction ---
 
 TEST(SortedTupleCore, CopyConstruct) {
-  SortedTuple<SizeofLess, double, char, int> t1(3.14, 'x', 42);
-  SortedTuple<SizeofLess, double, char, int> t2(t1);
+  Of<SizeofLess>::Tuple<double, char, int> t1(3.14, 'x', 42);
+  Of<SizeofLess>::Tuple<double, char, int> t2(t1);
   EXPECT_DOUBLE_EQ(t2.template Get<0>(), 3.14);
   EXPECT_EQ(t2.template Get<1>(), 'x');
   EXPECT_EQ(t2.template Get<2>(), 42);
@@ -107,8 +106,8 @@ TEST(SortedTupleCore, CopyConstruct) {
 // --- Move construction ---
 
 TEST(SortedTupleCore, MoveConstruct) {
-  SortedTuple<SizeofLess, double, char, int> t1(3.14, 'x', 42);
-  SortedTuple<SizeofLess, double, char, int> t2(std::move(t1));
+  Of<SizeofLess>::Tuple<double, char, int> t1(3.14, 'x', 42);
+  Of<SizeofLess>::Tuple<double, char, int> t2(std::move(t1));
   EXPECT_DOUBLE_EQ(t2.template Get<0>(), 3.14);
   EXPECT_EQ(t2.template Get<1>(), 'x');
   EXPECT_EQ(t2.template Get<2>(), 42);
@@ -117,8 +116,8 @@ TEST(SortedTupleCore, MoveConstruct) {
 // --- Copy assignment ---
 
 TEST(SortedTupleCore, CopyAssign) {
-  SortedTuple<SizeofLess, double, char, int> t1(3.14, 'x', 42);
-  SortedTuple<SizeofLess, double, char, int> t2;
+  Of<SizeofLess>::Tuple<double, char, int> t1(3.14, 'x', 42);
+  Of<SizeofLess>::Tuple<double, char, int> t2;
   t2 = t1;
   EXPECT_DOUBLE_EQ(t2.template Get<0>(), 3.14);
   EXPECT_EQ(t2.template Get<1>(), 'x');
@@ -127,8 +126,8 @@ TEST(SortedTupleCore, CopyAssign) {
 
 // --- Move assignment ---
 TEST(SortedTupleCore, MoveAssign) {
-  SortedTuple<SizeofLess, double, char, int> t1(3.14, 'x', 42);
-  SortedTuple<SizeofLess, double, char, int> t2;
+  Of<SizeofLess>::Tuple<double, char, int> t1(3.14, 'x', 42);
+  Of<SizeofLess>::Tuple<double, char, int> t2;
   t2 = std::move(t1);
   EXPECT_DOUBLE_EQ(t2.template Get<0>(), 3.14);
   EXPECT_EQ(t2.template Get<1>(), 'x');
@@ -138,13 +137,13 @@ TEST(SortedTupleCore, MoveAssign) {
 // --- Mutability via Get ---
 
 TEST(SortedTupleCore, GetByIndexMutate) {
-  SortedTuple<SizeofLess, double, char, int> t(3.14, 'x', 42);
+  Of<SizeofLess>::Tuple<double, char, int> t(3.14, 'x', 42);
   t.template Get<2>() = 99;
   EXPECT_EQ(t.template Get<2>(), 99);
 }
 
 TEST(SortedTupleCore, GetByTypeMutate) {
-  SortedTuple<SizeofLess, double, char, int> t(3.14, 'x', 42);
+  Of<SizeofLess>::Tuple<double, char, int> t(3.14, 'x', 42);
   t.template Get<char>() = 'z';
   EXPECT_EQ(t.template Get<char>(), 'z');
 }
@@ -152,8 +151,8 @@ TEST(SortedTupleCore, GetByTypeMutate) {
 // --- Swap ---
 
 TEST(SortedTupleCore, Swap) {
-  SortedTuple<SizeofLess, double, char, int> t1(1.0, 'a', 10);
-  SortedTuple<SizeofLess, double, char, int> t2(2.0, 'b', 20);
+  Of<SizeofLess>::Tuple<double, char, int> t1(1.0, 'a', 10);
+  Of<SizeofLess>::Tuple<double, char, int> t2(2.0, 'b', 20);
   t1.Swap(t2);
   EXPECT_DOUBLE_EQ(t1.template Get<0>(), 2.0);
   EXPECT_EQ(t1.template Get<1>(), 'b');

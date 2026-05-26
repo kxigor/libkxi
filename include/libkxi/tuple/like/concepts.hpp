@@ -3,7 +3,6 @@
 #include <concepts>
 #include <cstddef>
 #include <libkxi/meta.hpp>
-#include <type_traits>
 #include <utility>
 
 namespace kxi::tuple::like::concepts {
@@ -34,8 +33,10 @@ concept SwappableTuple =
     TupleLike<T> && requires(T tuple) { tuple.Swap(tuple); };
 
 template <typename T>
-concept DistinctTupleLike = TupleLike<T> && requires {
-  typename meta::RebindT<T, meta::pack::PackHolder>;
-} && details::HasAllTypeGetsV<T, meta::RebindT<T, meta::pack::PackHolder>>;
+concept DistinctTupleLike =
+    TupleLike<T> &&
+    requires { typename meta::RebindT<T, meta::pack::PackHolder>; } &&
+    meta::concepts::Distinct<meta::RebindT<T, meta::pack::PackHolder>> &&
+    details::HasAllTypeGetsV<T, meta::RebindT<T, meta::pack::PackHolder>>;
 
 }  // namespace kxi::tuple::like::concepts

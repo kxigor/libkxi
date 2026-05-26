@@ -1,248 +1,207 @@
-# Modern C++ Project Template
+# libkxi
 
-This repository serves as a robust foundation for C++ projects, configured for the modern **C++23** standard. It features a pre-configured CMake build system, integration with code sanitizers, static analysis, code formatting, and comprehensive testing tools.
+A header-only C++23 library for compile-time type-list manipulation and a
+tuple family built on top of it. The tuples reorder their elements internally
+according to a user-supplied predicate while preserving the original
+construction and access order, so call sites stay unchanged.
 
-## Features at a Glance
+## Modules
 
-* **Standard:** C++23 required.
-* **Build System:** Uses `CMakePresets.json` for streamlined, repeatable configuration across different environments.
-* **Code Safety (Sanitizers):** Seamless integration with Clang/GCC Sanitizers (Address, Thread, Memory, Undefined).
-* **Code Quality:**
-  * Strict compiler warnings enforced via `cmake/ProjectOptions.cmake`.
-  * Automatic formatting check (`clang-format`).
-  * Static analysis (`clang-tidy`).
-* **Testing:** Integrated unit testing using Google Test (GTest).
-* **Code Coverage:** Integrated LCOV/GCOV generation.
+### `kxi::meta`
 
-## Prerequisites
-To fully utilize this project, you will need the following tools installed:
-* **CMake** (version 3.25 or higher)
-* **C++ Compiler** with C++23 support (GCC 13+, Clang 16+, or MSVC)
-* **Ninja** (Recommended generator, specified in the presets)
-* **LLVM Utilities:** `clang-format`, `clang-tidy`
-* **Coverage Tools:** `gcov`, `lcov`, and `genhtml` (required for coverage reports).
+Operations over heterogeneous type lists. A *type list* is any class template
+of the form `Shell<Args...>`.
 
-## Building and Running
+- `Size<L>` / `SizeV<L>` — number of elements.
+- `TypeAt<I, L>` / `TypeAtT<I, L>` — element type at index `I`.
+- `Count<T, L>` / `CountV<T, L>` — number of occurrences of `T`.
+- `IndexOf<T, L>` / `IndexOfV<T, L>` — position of `T` (requires the list to
+  hold each type at most once).
+- `IsDistinct<L>` / `concepts::Distinct` — all elements unique.
+- `LocateIndex<I, Ls...>` — flat-position translation across several lists.
+- `CatLists<Ls...>` — list concatenation.
+- `Rebind<L, Shell>` — re-host the same elements in a different shell.
+- `ShellOf<L>` — type-level handle to the source shell.
+- `IsSameShell` / `IsAllSameShells` / `CommonShellOf` — shell comparison.
+- `Sort<Predicate, L>` — stable compile-time sort.
 
-The project heavily relies on **CMake Presets** defined in `CMakePresets.json`.
+`kxi::meta::pack` provides the same operations on bare parameter packs through
+`PackHolder<Args...>`.
 
-### 1. View Available Presets
-To see all available configurations:
-```shell
+### `kxi::utility`
+
+Small type-level building blocks.
+
+- `CopyConst<From, To>` / `CopyCV<From, To>` — qualifier propagation.
+- `IsIndexSequence<T>` — concept and trait.
+- `concepts::PerfectCtorGuard<Self, Args...>` — protects a perfect-forwarding
+  constructor from shadowing the copy and move constructors.
+- `IndexedType<I, T>` — single-element holder used as a base class brick for
+  tuples; provides EBO-friendly storage via `[[no_unique_address]]`.
+
+### `kxi::tuple::flat`
+
+`flat::Tuple<Args...>` is the ground-truth tuple. Element order is the
+declaration order; elements are stored as distinct `IndexedType<I, T>` base
+subobjects.
+
+```cpp
+#include <libkxi/tuple/flat.hpp>
+
+kxi::tuple::flat::Tuple<int, double, std::string> t(42, 3.14, "hi");
+int        x = t.Get<0>();        // by index
+double     y = t.Get<double>();   // by type (unique types only)
+```
+
+### `kxi::tuple::sorted`
+
+`sorted::Of<Predicate>::Tuple<Args...>` reorders its storage by a binary
+predicate, but `Get<I>` and `Get<T>` see the user-supplied order. The predicate
+is a class template with a `value` member (`Predicate<A, B>::value`).
+
+```cpp
+#include <libkxi/tuple/sorted.hpp>
+
+template <typename A, typename B>
+struct SizeofLess {
+  static constexpr bool value = sizeof(A) < sizeof(B);
+};
+
+using namespace kxi::tuple::sorted;
+
+Of<SizeofLess>::Tuple<double, char, int> t(3.14, 'x', 42);
+//                                         ^^^^^ stored as (char, int, double)
+double a = t.Get<0>();   // 3.14   — original index
+char   b = t.Get<1>();   // 'x'
+int    c = t.Get<2>();   // 42
+```
+
+Free factories carry the predicate explicitly:
+
+```cpp
+auto t = sorted::Make<SizeofLess>(1, 2.0, 'x');
+auto u = sorted::Tie<SizeofLess>(a, b);
+```
+
+### `kxi::tuple::compact`
+
+`compact::Tuple<Args...>` is `sorted::Of<P>::Tuple<Args...>` where `P` is the
+built-in alignment-descending predicate. Same observable order as `flat::Tuple`
+for `Get<I>`, but the in-memory layout is reordered to minimise padding.
+
+### `kxi::tuple::like`
+
+Generic free-function API that works with any type satisfying the
+`like::concepts::TupleLike` shape (has `meta::SizeV` and member `Get<I>`).
+
+- `Get<I>(t)` / `Get<T>(t)` — uniform getter with full value-category and cv
+  forwarding.
+- `Swap(a, b)` — free-function swap.
+- `Cat(t1, t2, ...)` — concatenate tuples of the same shell.
+- `SpanGet<I>(t1, t2, ...)` — index across a span of tuples as if they were one
+  flat list.
+- `Make`, `Tie`, `Forward`, `ForwardInto` — factories parameterised by the
+  target shell.
+
+`flat::`, `sorted::` and `compact::` re-export these names so call sites read
+naturally inside each namespace.
+
+## Requirements
+
+- CMake 3.25 or newer.
+- A C++23-capable compiler. Tested with recent GCC and Clang.
+- Ninja (recommended; the presets declare it).
+- clang-format and clang-tidy for the format and tidy checks (optional but
+  enabled by default in the dev presets).
+- gcov, lcov, genhtml for HTML coverage reports (only needed for the coverage
+  preset).
+
+## Building
+
+The project ships `CMakePresets.json` with several configurations.
+
+```
 cmake --list-presets
 ```
 
-### 2. Standard Development and Debugging
-The most common scenario is a Debug build with the **Address Sanitizer (ASan)** enabled to catch memory leaks and access violations.
+A typical development cycle uses the AddressSanitizer preset:
 
-| Configuration | Command | Description |
-|:---|:---|:---|
-| **Configure** | `cmake --preset dev-debug-asan` | Configures a Debug build with ASan enabled. |
-| **Build** | `cmake --build --preset dev-debug-asan` | Builds all targets (app, tests) in the ASan configuration. |
-| **Run Executable** | `./build/dev-debug-asan/app/app` | Executes the main application. |
-
-### 3. Using Sanitizer Profiles
-The template includes specialized profiles for debugging various issues.
-
-| Preset Name | Sanitizer | Compiler Flags Added | Purpose |
-|:---|:---|:---|:---|
-| `dev-debug-asan` | Address Sanitizer | `-fsanitize=address` | Memory errors, leaks, use-after-free. |
-| `dev-debug-tsan` | Thread Sanitizer | `-fsanitize=thread` | Data races and deadlocks in concurrent code. |
-| `dev-debug-msan` | Memory Sanitizer | `-fsanitize=memory` | Checks for uninitialized reads (special setup required). |
-| `dev-debug-ubsan` | Undefined Behavior Sanitizer | `-fsanitize=undefined` | Integer overflows, unaligned loads, null pointer references. |
-
-### 4. Release Build (CI / Production)
-For maximum performance (no sanitizers, optimized compilation):
-
-| Configuration | Command | Description |
-|:---|:---|:---|
-| **Configure** | `cmake --preset ci-release` | Configures a Release build (`-O3 -DNDEBUG`). |
-| **Build** | `cmake --build --preset ci-release` | Builds all targets with optimizations. |
-
-## Testing and Quality Checks
-Tests and quality checks are managed using CTest, allowing them to be run across any configuration profile.
-
-### 1. Running Unit Tests (GTest)
-Unit tests are linked against the `project_coverage` target, so they generate coverage data when compiled with the `ci-coverage` preset, and they use the selected sanitizer in `dev-debug-*` presets.
-
-**Run tests in the ASan configuration:**
-
-```shell
-# Configure and build first
+```
 cmake --preset dev-debug-asan
 cmake --build --preset dev-debug-asan
-
-# Run all tests linked to ASan
 ctest --preset dev-debug-asan
 ```
 
-**Running specific tests:**
+Available presets:
 
-You can use CTest's regular expression filtering:
+| Preset             | Build type | Notes                                   |
+|--------------------|------------|-----------------------------------------|
+| `dev-debug-asan`   | Debug      | AddressSanitizer                        |
+| `dev-debug-tsan`   | Debug      | ThreadSanitizer                         |
+| `dev-debug-msan`   | Debug      | MemorySanitizer (requires libc++)       |
+| `dev-debug-ubsan`  | Debug      | UndefinedBehaviorSanitizer              |
+| `ci-release`       | Release    | `-O3 -DNDEBUG`, no sanitizers           |
+| `ci-coverage`      | Debug      | `--coverage` flags for gcov/lcov        |
 
-```shell
-# Run all tests
+## Testing
+
+Tests are GoogleTest-based and registered through the `add_gtest` helper in
+`cmake/GtestTools.cmake`.
+
+```
 ctest --preset dev-debug-asan
-
-# Run tests only from the 'Basic' suite
-ctest --preset dev-debug-asan -R Basic
+ctest --preset dev-debug-asan -R FlatTuple
 ```
 
-### 2. Static Analysis and Formatting
+Two extra CTest entries are registered as quality gates:
 
-Static analysis tools are registered as custom targets or CTest tests within the project.
+- `FormatCheck` — runs `clang-format` in check mode.
+- `TidyCheck` — runs `clang-tidy` across the public headers.
 
-| QA Target | CTest Command | Custom Build Command | Purpose |
-|:---|:---|:---|:---|
-| **Format Check** | `ctest --preset <preset> -R FormatCheck` | `cmake --build --preset <preset> --target format` | Runs `clang-format` in check mode. |
-| **Tidy Check** | `ctest --preset <preset> -R TidyCheck` | N/A | Runs `clang-tidy` for static analysis. |
+Both are skipped if the corresponding tool is missing at configure time.
 
-### 3. Code Coverage (LCOV/GCOV)
+### Coverage
 
-To generate a coverage report, you must use the special **`ci-coverage`** preset, which enables the necessary `--coverage` flags (handled by `cmake/ProjectCoverage.cmake`).
-
-**Step 1: Configure and Build (using coverage flags)**
-
-```shell
+```
 cmake --preset ci-coverage
-cmake --build --preset ci-coverage
-```
-
-**Step 2: Run the dedicated `coverage` target**
-
-This target automatically performs zero-counting, runs CTest to generate `.gcda` files, captures the data into LCOV format, filters system headers, and generates the final HTML report.
-
-```shell
 cmake --build --preset ci-coverage --target coverage
 ```
 
-The final HTML report will be located at: **`build/ci-coverage/coverage_report/index.html`**
+The coverage target zeroes counters, runs the tests, captures `gcda` data via
+LCOV, filters system headers, and emits an HTML report at
+`build/ci-coverage/coverage_report/index.html`.
 
-## Configuration Details
+## Project layout
 
-### CMake Modules and Targets
+```
+include/libkxi/
+  meta/         compile-time type-list operations
+  utility/      small type-level building blocks
+  tuple/
+    flat/       declaration-order tuple
+    sorted/     tuple reordered by a predicate
+    compact/    alignment-descending alias of sorted
+    like/       generic free-function API
+tests/unit/     gtest unit tests (one target per file)
+app/            example executable
+cmake/          build, sanitizer, coverage and tooling modules
+```
 
-| Module File | Interface Target | Description |
-|:---|:---|:---|
-| `ProjectOptions.cmake` | `project_options` | Sets required C++ standard (C++23) and optimization level (`-O3`). |
-| `ProjectSanitizers.cmake` | `project_sanitizers` | Applies ASan, TSan, MSan, or UBSan flags conditionally. |
-| `ProjectCoverage.cmake` | `project_coverage` | Applies GCC/Clang `--coverage` flags conditionally. |
-
-To apply flags to a target (e.g., `app`), you link against the corresponding interface target:
+## Adding a test
 
 ```cmake
-target_link_libraries(app
-  PRIVATE
-    project_options
-    project_sanitizers
+add_gtest(MyTest
+  SOURCES my_test.cpp
+  LIBRARIES
     project_coverage
+    libkxi
 )
 ```
 
-# GTest Usage Examples: add_gtest function
+Optional arguments are documented in the header of
+`cmake/GtestTools.cmake` (sanitizer linkage, environment variables, fixtures,
+serial execution, custom defines, etc.).
 
-The examples below illustrate how to use the `add_gtest` function to register Google Test suites within the CMake build system, from the simplest case to the most complex one.
+## License
 
-## 1. Simplest Example (Minimal Configuration)
-
-This example is suitable for basic tests that link against a core project library and do not require special options or sanitizers.
-
-### Scenario: Testing a basic math utility.
-
-```cmake
-add_gtest(BasicMathTest
-  SOURCES
-    math_test.cpp
-  LIBRARIES
-    MyCoreLib::Math
-    GTest::gtest_main
-)
-````
-
-| Argument | Description |
-|:---|:---|
-| `BasicMathTest` | The name of the test executable and the test name in CTest. |
-| `SOURCES` | The single source file for the test executable. |
-| `LIBRARIES` | Links against the library under test and the main GTest library. |
-
------
-
-## 2\. Standard Example (Including Sanitizers and Coverage)
-
-This is the most common scenario, involving linking against the interface targets `project_options`, `project_sanitizers`, and `project_coverage` to ensure automatic support for all build modes (Debug, ASan, Coverage).
-
-### Scenario: Testing a network connection API component.
-
-```cmake
-add_gtest(NetworkAPITests
-  SOURCES
-    api_test.cpp
-    connection_mock.cpp
-  LIBRARIES
-    MyCoreLib::Networking
-    project_options
-    project_sanitizers
-    project_coverage
-  PROPERTIES
-    TIMEOUT 90
-)
-```
-
-| Argument | Description |
-|:---|:---|
-| `SOURCES` | Multiple files: the test itself and possibly mocks/stubs. |
-| `LIBRARIES` | Includes all interface targets for full integration. |
-| `PROPERTIES` | Sets a CTest property: execution timeout of 90 seconds. |
-
------
-
-## 3\. Advanced Example (Using All Flags)
-
-This example demonstrates the use of all available arguments, useful for tests that require a specific environment, custom compilation flags, or execution in a single thread.
-
-### Scenario: Testing a critical, thread-sensitive code section with extra debugging definitions.
-
-```cmake
-add_gtest(CriticalSectionTests
-  SOURCES
-    lock_free_test.cpp
-  LIBRARIES
-    MyCoreLib::Concurrency
-    project_options
-    project_sanitizers
-  
-  # Options
-  EXCLUSIVE
-  
-  # Values
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests/data
-  
-  # Additional compiler and linker settings
-  INCLUDE_DIRECTORIES
-    ${CMAKE_SOURCE_DIR}/third_party/atomic_queue/include
-  COMPILE_OPTIONS
-    -Wno-conversion
-  COMPILE_DEFINITIONS
-    USE_DEBUG_LOGGING
-    LOCK_FREE_ENABLED
-  LINK_OPTIONS
-    -Wl,--export-dynamic
-  
-  # Additional CTest properties
-  PROPERTIES
-    TIMEOUT 180
-    FIXTURES_SETUP "Setup_Heavy_System"
-    ENVIRONMENT "DEBUG_LEVEL=5;CONFIG_FILE=test.conf"
-)
-
-```
-| Argument | Description |
-|:---|:---|
-| `EXCLUSIVE` | Ensures this test runs sequentially (not in parallel), which is critical for TSan tests. |
-| `WORKING_DIRECTORY` | Sets the working directory, e.g., to access test data (config files). |
-| `INCLUDE_DIRECTORIES` | Adds an external header path (e.g., for a third-party library). |
-| `COMPILE_OPTIONS` | Suppresses a specific warning only for this test file. |
-| `COMPILE_DEFINITIONS` | Defines macros required for conditional compilation in test mode. |
-| `LINK_OPTIONS` | Passes specific flags to the linker. |
-| `PROPERTIES` | Additional CTest properties, including setting environment variables (`ENVIRONMENT`) or using test fixtures. |
-```
+MIT. See `LICENSE`.

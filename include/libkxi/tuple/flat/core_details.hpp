@@ -1,5 +1,6 @@
 #pragma once
 
+#include <concepts>
 #include <cstddef>
 #include <libkxi/meta.hpp>
 #include <libkxi/utility.hpp>
@@ -56,7 +57,7 @@ class TupleImpl<std::index_sequence<Indexes...>,
 
   constexpr void Swap(TupleImpl& other) noexcept(
       (std::is_nothrow_swappable_v<Types> && ...)) {
-    (std::swap(Get<Indexes>(), other.Get<Indexes>()), ...);
+    (std::ranges::swap(Get<Indexes>(), other.Get<Indexes>()), ...);
   }
 
   /*========================== Impls ===========================*/

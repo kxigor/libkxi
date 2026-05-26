@@ -33,7 +33,7 @@ template <std::size_t I, typename... Types>
 using TypeAt = meta::TypeAt<I, PackHolder<Types...>>;
 
 template <std::size_t I, typename... Types>
-using TypeAtT = typename TypeAt<I, Types...>::type;
+using TypeAtT = TypeAt<I, Types...>::type;
 
 template <typename T, typename... Types>
 using Count = meta::Count<T, PackHolder<Types...>>;

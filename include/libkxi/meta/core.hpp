@@ -44,7 +44,7 @@ template <std::size_t I, concepts::TList TList>
 using TypeAt = details::TypeAtImpl<I, std::remove_cvref_t<TList>>;
 
 template <std::size_t I, concepts::TList TList>
-using TypeAtT = typename TypeAt<I, TList>::type;
+using TypeAtT = TypeAt<I, TList>::type;
 
 namespace details {
 template <typename T, typename TList>
@@ -72,7 +72,7 @@ inline constexpr std::size_t CountV = Count<T, TList>::value;
 
 namespace details {
 template <typename TList>
-struct IsDistinctImpl : std::true_type {};
+struct IsDistinctImpl;
 
 template <template <typename...> typename Shell, typename... Types>
 struct IsDistinctImpl<Shell<Types...>> {
@@ -232,7 +232,7 @@ inline constexpr auto IsSameTemplateV =
     IsSameTemplate<FirstTemplate, SecondTemplate>::value;
 
 template <template <typename...> typename... Templates>
-struct IsAllSameTemplates : IsAllSameTypes<TemplateHolder<Templates...>> {};
+struct IsAllSameTemplates : IsAllSameTypes<TemplateHolder<Templates>...> {};
 
 template <template <typename...> typename... Templates>
 inline constexpr auto IsAllSameTemplatesV =

@@ -25,7 +25,9 @@ Checks: >
   -google-explicit-constructor,
   -cppcoreguidelines-missing-std-forward,
   -hicpp-explicit-conversions,
-  -cppcoreguidelines-pro-bounds-constant-array-index
+  -cppcoreguidelines-pro-bounds-constant-array-index,
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
+  -misc-multiple-inheritance
 WarningsAsErrors: '*'
 
 CheckOptions:

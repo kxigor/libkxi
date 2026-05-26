@@ -16,7 +16,7 @@ struct CopyConst<const From, To> {
 };
 
 template <typename From, typename To>
-using CopyConstT = typename CopyConst<From, To>::type;
+using CopyConstT = CopyConst<From, To>::type;
 
 namespace details {
 
@@ -47,7 +47,7 @@ struct CopyCVImpl<const volatile From> {
 }  // namespace details
 
 template <typename From, typename To>
-using CopyCVT = typename details::CopyCVImpl<
+using CopyCVT = details::CopyCVImpl<
     std::remove_reference_t<From>>::template type<std::remove_reference_t<To>>;
 
 template <typename T>
@@ -101,17 +101,25 @@ struct IndexedType {
   constexpr IndexedType& operator=(IndexedType&& /*unused*/) = default;
 
   /*========================= Getters ==========================*/
-  ValueT& Value() { return value_; }
 
-  const ValueT& Value() const { return value_; }
+  template <typename Self>
+  constexpr decltype(auto) Value(this Self&& self) noexcept {
+    return std::forward_like<Self>(self.value_);
+  }
 
-  volatile ValueT& Value() volatile { return value_; }
+  constexpr ValueT& Value() { return value_; }
 
-  const volatile ValueT& Value() const volatile { return value_; }
+  [[nodiscard]] constexpr const ValueT& Value() const { return value_; }
+
+  constexpr volatile ValueT& Value() volatile { return value_; }
+
+  [[nodiscard]] constexpr const volatile ValueT& Value() const volatile {
+    return value_;
+  }
 
  private:
   /*======================= Data fields ========================*/
-  ValueT value_{};
+  [[no_unique_address]] ValueT value_{};
 };
 
 }  // namespace kxi::utility

@@ -1,14 +1,15 @@
 #pragma once
 
 #include <libkxi/tuple/sorted.hpp>
+#include <type_traits>
 
 namespace kxi::tuple::compact {
 
-/*TODO: impl*/
 template <typename LHS, typename RHS>
-struct CompactPredicat;
+struct CompactPredicat
+    : std::integral_constant<bool, (alignof(LHS) > alignof(RHS))> {};
 
 template <typename... Args>
-using CompactTuple = sorted::SortedTuple<CompactPredicat, Args...>;
+using CompactTuple = sorted::Of<CompactPredicat>::Tuple<Args...>;
 
 };  // namespace kxi::tuple::compact

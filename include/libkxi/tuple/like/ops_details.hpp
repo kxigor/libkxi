@@ -9,7 +9,7 @@ namespace kxi::tuple::like::details {
 template <concepts::TupleLike... TuplesT>
 struct SpanGetHelper {
   using FirstShellT = meta::ShellOfT<meta::pack::TypeAtT<0, TuplesT...>>;
-  using RefsTupleT = typename FirstShellT::template type<TuplesT&...>;
+  using RefsTupleT = FirstShellT::template type<TuplesT&...>;
 
   template <std::size_t I>
   [[nodiscard]] static constexpr decltype(auto) Get(RefsTupleT& refs) {
