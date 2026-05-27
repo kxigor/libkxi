@@ -81,7 +81,7 @@ if(NOT SANITIZER_MODE STREQUAL "None")
     $<$<AND:$<STREQUAL:${SANITIZER_MODE},Memory>,$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>>:${MSAN_FLAGS}>
 
     # --- UBSAN (Undefined Behavior Sanitizer) ---
-    $<$<AND:$<STREQUAL:${SANITITIZER_MODE},Undefined>,$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>>:${UBSAN_FLAGS}>
+    $<$<AND:$<STREQUAL:${SANITIZER_MODE},Undefined>,$<COMPILE_LANG_AND_ID:CXX,GNU,Clang>>:${UBSAN_FLAGS}>
   )
 
   # Apply selected flags to the interface target (compilation and linking)

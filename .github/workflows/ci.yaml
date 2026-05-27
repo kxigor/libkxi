@@ -7,16 +7,16 @@ on:
     branches: [main, develop]
 
 env:
-  LLVM_VERSION: 19
-  GCC_VERSION: 14
+  LLVM_VERSION: 22
+  GCC_VERSION: 15
 
 jobs:
   build-and-test:
     name: "${{ matrix.preset }} (${{ matrix.compiler }})"
     runs-on: ubuntu-24.04
-    
+
     strategy:
-      fail-fast: false  # Не останавливать другие jobs при падении одного
+      fail-fast: false
       matrix:
         include:
           # ===== Debug + ASan builds =====
@@ -24,7 +24,7 @@ jobs:
             compiler: clang
             cc: clang
             cxx: clang++
-            
+
           - preset: dev-debug-asan
             compiler: gcc
             cc: gcc
@@ -35,7 +35,7 @@ jobs:
             compiler: clang
             cc: clang
             cxx: clang++
-            
+
           - preset: ci-tests-release
             compiler: gcc
             cc: gcc
@@ -45,20 +45,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ===== Установка LLVM/Clang =====
+      # ===== LLVM/Clang =====
+      # clang-format and clang-tidy are required by FormatCheck / TidyCheck
+      # CTest targets even when the compiler under test is GCC.
       - name: Install LLVM ${{ env.LLVM_VERSION }}
         run: |
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh ${{ env.LLVM_VERSION }} all
-          
-          # Симлинки для clang tools (format, tidy)
+
+          # Generic clang-format / clang-tidy aliases (the cmake modules
+          # search versioned names first, but having the generic name around
+          # avoids surprises in editor integrations).
           sudo update-alternatives --install /usr/bin/clang-format clang-format \
             /usr/bin/clang-format-${{ env.LLVM_VERSION }} 100
           sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy \
             /usr/bin/clang-tidy-${{ env.LLVM_VERSION }} 100
 
-      # ===== Clang как компилятор =====
+      # ===== Clang as the compiler =====
       - name: Setup Clang ${{ env.LLVM_VERSION }} as compiler
         if: matrix.compiler == 'clang'
         run: |
@@ -67,14 +71,14 @@ jobs:
           sudo update-alternatives --install /usr/bin/clang++ clang++ \
             /usr/bin/clang++-${{ env.LLVM_VERSION }} 100
 
-      # ===== GCC как компилятор =====
+      # ===== GCC as the compiler =====
       - name: Setup GCC ${{ env.GCC_VERSION }} as compiler
         if: matrix.compiler == 'gcc'
         run: |
           sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
           sudo apt-get update
           sudo apt-get install -y gcc-${{ env.GCC_VERSION }} g++-${{ env.GCC_VERSION }}
-          
+
           sudo update-alternatives --install /usr/bin/gcc gcc \
             /usr/bin/gcc-${{ env.GCC_VERSION }} 100
           sudo update-alternatives --install /usr/bin/g++ g++ \
@@ -85,9 +89,8 @@ jobs:
 
       - name: Install GoogleTest
         run: |
-          sudo apt-get update
           sudo apt-get install -y libgtest-dev
-          # В Ubuntu пакет содержит только исходники, их нужно собрать
+          # Ubuntu ships the GTest source; we still need to build & install it.
           cd /usr/src/googletest
           sudo cmake .
           sudo cmake --build .
@@ -97,7 +100,6 @@ jobs:
         run: |
           echo "=== Compiler ==="
           ${{ matrix.cxx }} --version
-          echo ""
           echo "=== Clang Tools ==="
           clang-format --version
           clang-tidy --version
@@ -108,7 +110,6 @@ jobs:
           cmake --preset ${{ matrix.preset }} \
             -DCMAKE_C_COMPILER=${{ matrix.cc }} \
             -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
-            -DCMAKE_C_FLAGS="-Wno-unknown-warning-option -Wno-unused-command-line-argument" \
             -DCMAKE_CXX_FLAGS="-Wno-unknown-warning-option -Wno-unused-command-line-argument"
 
       - name: Build
@@ -117,15 +118,19 @@ jobs:
       - name: Test
         run: ctest --preset ${{ matrix.preset }} --verbose
         env:
-          # Sanitizer options (игнорируются для release builds)
           ASAN_OPTIONS: "detect_leaks=1:abort_on_error=1:print_stats=1"
           UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
 
-      # ===== Артефакты для release =====
+      # ===== Artifacts (release builds only) =====
+      # Upload just the executables, not the entire build tree (objects,
+      # ninja state, gcda files etc. inflate the artifact tenfold).
       - name: Upload artifacts
         if: matrix.preset == 'ci-tests-release'
         uses: actions/upload-artifact@v4
         with:
           name: build-${{ matrix.preset }}-${{ matrix.compiler }}
-          path: build/${{ matrix.preset }}/
+          path: |
+            build/${{ matrix.preset }}/app/app
+            build/${{ matrix.preset }}/tests/unit/**/[A-Z]*
+          if-no-files-found: warn
           retention-days: 7

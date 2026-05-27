@@ -2,12 +2,11 @@
 # 1. FINDING ALL FILES FOR STATIC ANALISYS
 # ========================================
 
-file(GLOB_RECURSE ALL_SRCS
+file(GLOB_RECURSE ALL_SRCS CONFIGURE_DEPENDS
   "${PROJECT_SOURCE_DIR}/app/*.cpp"
   "${PROJECT_SOURCE_DIR}/app/*.hpp"
   "${PROJECT_SOURCE_DIR}/src/*.cpp"
   "${PROJECT_SOURCE_DIR}/src/*.hpp"
-  "${PROJECT_SOURCE_DIR}/include/*.cpp"
   "${PROJECT_SOURCE_DIR}/include/*.hpp"
 )
 
@@ -26,7 +25,7 @@ set(TIDY_CONFIG "${PROJECT_SOURCE_DIR}/.clang-tidy")
 # ========================================
 # 3.1 Format TEST
 # ========================================
-if(ENABLE_FORMAT_CHECK)
+if(LIBKXI_ENABLE_FORMAT_CHECK)
   add_test(
     NAME FormatCheck
     COMMAND bash ${SCRIPTS_DIR}/check_format.sh
@@ -39,7 +38,7 @@ endif()
 # ========================================
 # 3.2 Tidy TEST
 # ========================================
-if(ENABLE_TIDY_CHECK)
+if(LIBKXI_ENABLE_TIDY_CHECK)
   add_test(
     NAME TidyCheck
     COMMAND ${Python3_EXECUTABLE} ${SCRIPTS_DIR}/check_tidy.py

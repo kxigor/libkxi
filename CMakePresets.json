@@ -13,7 +13,7 @@
       "binaryDir": "${sourceDir}/build/${presetName}",
       "cacheVariables": {
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "ENABLE_TESTING": "ON"
+        "LIBKXI_BUILD_TESTS": "ON"
       }
     },
     {
@@ -29,8 +29,7 @@
     {
       "name": "mixin-san-memory",
       "hidden": true,
-      "toolchainFile": "", 
-      "description": "Requires libc++ build usually",
+      "description": "Requires an instrumented libc++ build (set a toolchain file at the preset that uses this mixin).",
       "cacheVariables": { "SANITIZER_MODE": "Memory" }
     },
     {
@@ -71,15 +70,15 @@
     },
     {
       "name": "ci-coverage",
-      "displayName": "Release + UnitTests + Coverage",
-      "description" : "Build with GCOV flags. Static analysis is disabled for speed.",
+      "displayName": "Debug + UnitTests + Coverage",
+      "description" : "Build with GCOV flags. Debug build so branches and inlining stay observable. Static analysis is disabled for speed.",
       "inherits": ["base", "mixin-san-none"],
-      "cacheVariables": { 
-        "CMAKE_BUILD_TYPE": "Release",
-        "ENABLE_COVERAGE": "ON",
-        "ENABLE_UNITTESTS": "ON",
-        "ENABLE_FORMAT_CHECK": "OFF",
-        "ENABLE_TIDY_CHECK": "OFF"
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "LIBKXI_ENABLE_COVERAGE": "ON",
+        "LIBKXI_BUILD_TESTS": "ON",
+        "LIBKXI_ENABLE_FORMAT_CHECK": "OFF",
+        "LIBKXI_ENABLE_TIDY_CHECK": "OFF"
       }
     },
     {
@@ -100,9 +99,10 @@
       "displayName": "Release",
       "description": "Final deployment build. No testing.",
       "inherits": ["base", "mixin-san-none"],
-      "cacheVariables": { 
+      "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "ENABLE_TESTING": "OFF"
+        "LIBKXI_BUILD_TESTS": "OFF",
+        "LIBKXI_BUILD_APP": "OFF"
       }
     }
   ],

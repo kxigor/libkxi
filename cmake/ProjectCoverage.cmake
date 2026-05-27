@@ -6,9 +6,9 @@
 # This module defines the architecture necessary for measuring code coverage
 # using GCC/Clang (GCOV/LCOV format).
 # 
-# It creates the 'project_coverage' INTERFACE library to conditionally apply 
-# coverage flags only when the ENABLE_COVERAGE option is ON. This allows 
-# linking against 'project_coverage' without affecting the build when coverage 
+# It creates the 'project_coverage' INTERFACE library to conditionally apply
+# coverage flags only when the LIBKXI_ENABLE_COVERAGE option is ON. This allows
+# linking against 'project_coverage' without affecting the build when coverage
 # is disabled (the library becomes a no-op).
 
 include_guard()
@@ -19,7 +19,7 @@ add_library(project_coverage INTERFACE)
 # ========================================
 # 2. CONDITIONAL FLAG APPLICATION & TOOLS
 # ========================================
-if(ENABLE_COVERAGE)
+if(LIBKXI_ENABLE_COVERAGE)
   # Use the standard GCC/Clang flag which enables both instrumentation and 
   # branch coverage features (-fprofile-arcs, -ftest-coverage).
   set(COVERAGE_FLAGS "--coverage")
@@ -50,9 +50,8 @@ if(ENABLE_COVERAGE)
 
     add_custom_target(coverage
       COMMAND ${CMAKE_COMMAND} -E make_directory ${LCOV_OUTPUT_DIR}
-      COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}
       COMMAND ${LCOV_EXECUTABLE} --zerocounters --directory ${CMAKE_BINARY_DIR}
-      COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target test
+      COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure --test-dir ${CMAKE_BINARY_DIR}
       COMMAND ${LCOV_EXECUTABLE} --capture --directory ${CMAKE_BINARY_DIR} --output-file ${LCOV_INFO_FILE}
       COMMAND ${LCOV_EXECUTABLE} --remove ${LCOV_INFO_FILE} '/usr/*' '*/third_party/*' -o ${LCOV_INFO_FILE}
       COMMAND ${GENHTML_EXECUTABLE} ${LCOV_INFO_FILE} --output-directory ${LCOV_OUTPUT_DIR}
