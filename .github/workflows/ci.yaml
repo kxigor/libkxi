@@ -79,6 +79,12 @@ jobs:
           sudo update-alternatives --install /usr/bin/clang++ clang++ \
             /usr/bin/clang++-${{ env.LLVM_VERSION }} 100
 
+      # ===== Clang format =====
+      - name: Install clang-format (pinned to match local)
+        run: |
+          pip install --break-system-packages "clang-format==22.1.5"
+          clang-format --version 
+
       # ===== GCC as the compiler =====
       - name: Setup GCC ${{ env.GCC_VERSION }} as compiler
         if: matrix.compiler == 'gcc'
