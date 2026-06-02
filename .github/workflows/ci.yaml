@@ -7,7 +7,7 @@ on:
     branches: [main, develop]
 
 env:
-  LLVM_VERSION: 22
+  LLVM_VERSION: 20
   GCC_VERSION: 15
   # Pin the standard library for clang explicitly so the build is deterministic
   # and does not silently fall back to whatever libstdc++ happens to be around.
