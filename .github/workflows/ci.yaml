@@ -98,9 +98,15 @@ jobs:
       - name: Install GoogleTest
         run: |
           sudo apt-get install -y libgtest-dev
-          # Ubuntu ships the GTest source; we still need to build & install it.
+          GTEST_FLAGS=""
+          if [ "${{ matrix.compiler }}" = "clang" ]; then
+            GTEST_FLAGS="${{ env.CLANG_STDLIB_FLAGS }}"
+          fi
           cd /usr/src/googletest
-          sudo cmake .
+          sudo cmake . \
+            -DCMAKE_C_COMPILER=${{ matrix.cc }} \
+            -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
+            -DCMAKE_CXX_FLAGS="$GTEST_FLAGS"
           sudo cmake --build .
           sudo cmake --install .
 
