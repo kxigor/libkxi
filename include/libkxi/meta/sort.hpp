@@ -42,7 +42,7 @@ struct Sort<PredicatT, Shell<Args...>> {
  private:
   [[nodiscard]] static constexpr IndexMapT MakePermutation() noexcept {
     IndexMapT result;
-    std::iota(result.begin(), result.end(), 0);
+    std::ranges::iota(result, 0);
 
     for (std::size_t i = 1; i < result.size(); ++i) {
       for (std::size_t j = 0; j < i; ++j) {
