@@ -11,7 +11,7 @@ namespace kxi::tuple::flat::details {
 
 template <utility::concepts::IndexSequence IndexesCortage,
           meta::pack::concepts::PackHolder TypesCortage>
-struct TupleImpl;
+class TupleImpl;
 
 template <std::size_t... Indexes, typename... Types>
 class TupleImpl<std::index_sequence<Indexes...>,
