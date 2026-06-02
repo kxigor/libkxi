@@ -9,6 +9,12 @@ on:
 env:
   LLVM_VERSION: 22
   GCC_VERSION: 15
+  # Pin the standard library for clang explicitly so the build is deterministic
+  # and does not silently fall back to whatever libstdc++ happens to be around.
+  # libc++ is used for clang because it is free of the clang+libstdc++
+  # std::forward_like bug (LLVM #101614). -fexperimental-library is harmless if
+  # not needed and unlocks not-yet-stabilized C++23 bits in libc++.
+  CLANG_STDLIB_FLAGS: "-stdlib=libc++ -fexperimental-library"
 
 jobs:
   build-and-test:
@@ -48,6 +54,8 @@ jobs:
       # ===== LLVM/Clang =====
       # clang-format and clang-tidy are required by FormatCheck / TidyCheck
       # CTest targets even when the compiler under test is GCC.
+      # `all` also installs libc++-${LLVM_VERSION}-dev / libc++abi, which is
+      # exactly what the clang legs link against via CLANG_STDLIB_FLAGS.
       - name: Install LLVM ${{ env.LLVM_VERSION }}
         run: |
           wget https://apt.llvm.org/llvm.sh
@@ -100,6 +108,12 @@ jobs:
         run: |
           echo "=== Compiler ==="
           ${{ matrix.cxx }} --version
+          echo "=== stdlib / ranges::iota check ==="
+          # Use the exact same stdlib flags the build will use, so this probe
+          # reflects reality. _LIBCPP_VERSION => libc++, _GLIBCXX_RELEASE => libstdc++.
+          echo '#include <version>' | ${{ matrix.cxx }} -std=c++23 ${{ matrix.compiler == 'clang' && env.CLANG_STDLIB_FLAGS || '' }} -x c++ -dM -E - \
+            | grep -E '_LIBCPP_VERSION|_GLIBCXX_RELEASE|__cpp_lib_ranges_iota' \
+            || echo "ranges::iota macro NOT defined (use std::iota or check stdlib)"
           echo "=== Clang Tools ==="
           clang-format --version
           clang-tidy --version
@@ -107,10 +121,14 @@ jobs:
       # ===== CMake Configure / Build / Test =====
       - name: Configure
         run: |
+          EXTRA_FLAGS="-Wno-unknown-warning-option -Wno-unused-command-line-argument"
+          if [ "${{ matrix.compiler }}" = "clang" ]; then
+            EXTRA_FLAGS="$EXTRA_FLAGS ${{ env.CLANG_STDLIB_FLAGS }}"
+          fi
           cmake --preset ${{ matrix.preset }} \
             -DCMAKE_C_COMPILER=${{ matrix.cc }} \
             -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
-            -DCMAKE_CXX_FLAGS="-Wno-unknown-warning-option -Wno-unused-command-line-argument"
+            -DCMAKE_CXX_FLAGS="$EXTRA_FLAGS"
 
       - name: Build
         run: cmake --build --preset ${{ matrix.preset }}
